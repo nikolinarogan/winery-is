@@ -1,5 +1,4 @@
--- Sample data for PostgreSQL Vinarija schema (FIXED VERSION)
--- Based on the specific table structure provided
+-- Sample data for PostgreSQL Vinarija schema
 
 -- Insert grape varieties
 INSERT INTO Sorta_Grozdja (IdSrt, Boja, ProcSec, NazSrt) VALUES

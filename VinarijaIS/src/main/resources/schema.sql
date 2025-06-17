@@ -1,5 +1,4 @@
 -- PostgreSQL compatible schema for Vinarija application
--- Converted from Oracle DDL
 
 -- Create sequences for auto-incrementing IDs
 CREATE SEQUENCE IF NOT EXISTS vinograd_id_seq START WITH 1 INCREMENT BY 1;
