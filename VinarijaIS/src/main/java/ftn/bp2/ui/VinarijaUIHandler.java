@@ -1,21 +1,25 @@
 package ftn.bp2.ui;
 
+import ftn.bp2.service.ReportService;
 import ftn.bp2.service.VinogradService;
 import ftn.bp2.dto.VinogradDTO;
 
 import java.sql.SQLException;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Map;
 import java.util.Scanner;
 
 public class VinarijaUIHandler {
 
     private final Scanner scanner;
     private final VinogradService vinogradService;
+    private final ReportService reportService;
 
     public VinarijaUIHandler() {
         this.scanner = new Scanner(System.in);
         this.vinogradService = new VinogradService();
+        this.reportService = new ReportService();
     }
 
     public void start() {
@@ -30,7 +34,7 @@ public class VinarijaUIHandler {
                         handleVinogradOperations();
                         break;
                     case 2:
-
+                        handleReportOperations();
                         break;
                     case 3:
 
@@ -89,12 +93,58 @@ public class VinarijaUIHandler {
         }
     }
 
+    private void handleReportOperations(){
+        while (true) {
+            System.out.println("\n=== IZVEŠTAJI ===");
+            System.out.println("1. Broj vina po sorti grožđa");
+            System.out.println("2. Analiza berbi i zaposlenih po vinogradu");
+            System.out.println("3. Analiza performansi zaposlenih");
+            System.out.println("4. Analiza porudžbina sa detaljima");
+            System.out.println("0. Nazad");
+
+            int choice = getIntInput("Izaberite opciju: ");
+
+            switch (choice) {
+                case 1:
+                    try {
+                        displayGrapeVarietyWineCountReport();
+                    } catch (Exception e) {
+                        System.err.println("Greška prilikom generisanja izveštaja: " + e.getMessage());
+                    }
+                    break;
+                case 2:
+                    break;
+                case 3:
+                    break;
+                case 4:
+                    break;
+                case 0:
+                    return;
+                default:
+                    System.out.println("Nevažeća opcija.");
+            }
+        }
+    }
     private void displayMainMenu() {
         System.out.println("\n=== GLAVNI MENI ===");
         System.out.println("1. Operacije sa vinogradima");
         System.out.println("2. Izvještaji");
         System.out.println("3. Transakcije");
         System.out.println("0. Izlaz");
+    }
+
+    private void displayGrapeVarietyWineCountReport() throws Exception {
+        List<Map<String, Object>> results = reportService.getGrapeVarietyWineCount();
+
+        System.out.println("\n=== BROJ VINA PO SORTI GROŽĐA ===");
+        System.out.printf("%-25s %-15s%n", "Sorta grožđa", "Broj vina");
+        System.out.println("-".repeat(40));
+
+        for (Map<String, Object> row : results) {
+            System.out.printf("%-25s %-15d%n",
+                    row.get("grapeVariety"),
+                    row.get("numberOfWines"));
+        }
     }
 
     // Vinograd operations

@@ -1,4 +1,4 @@
--- PostgreSQL compatible schema for Vinarija application
+-- PostgreSQL compatible schema for Vinarija
 
 -- Create sequences for auto-incrementing IDs
 CREATE SEQUENCE IF NOT EXISTS vinograd_id_seq START WITH 1 INCREMENT BY 1;
@@ -142,3 +142,16 @@ CREATE TABLE se_prezentuje (
                                Degustacija_IdDeg INTEGER NOT NULL REFERENCES Degustacija(IdDeg),
                                PRIMARY KEY (Vino_IdVina, Degustacija_IdDeg)
 );
+
+--  sequences to start after existing data (run after inserting sample data)
+--  new inserts get unique IDs
+SELECT setval('vinograd_id_seq', COALESCE((SELECT MAX(IdV) FROM Vinograd), 0) + 1);
+SELECT setval('sorta_grozdja_id_seq', COALESCE((SELECT MAX(IdSrt) FROM Sorta_Grozdja), 0) + 1);
+SELECT setval('vino_id_seq', COALESCE((SELECT MAX(IdVina) FROM Vino), 0) + 1);
+SELECT setval('zaposleni_id_seq', COALESCE((SELECT MAX(IdZap) FROM Zaposleni), 0) + 1);
+SELECT setval('degustacija_id_seq', COALESCE((SELECT MAX(IdDeg) FROM Degustacija), 0) + 1);
+SELECT setval('kupac_id_seq', COALESCE((SELECT MAX(IdKup) FROM Kupac), 0) + 1);
+SELECT setval('narudzba_id_seq', COALESCE((SELECT MAX(IdNar) FROM Narudzba), 0) + 1);
+SELECT setval('podrum_id_seq', COALESCE((SELECT MAX(IdPod) FROM Podrum), 0) + 1);
+SELECT setval('bure_id_seq', COALESCE((SELECT MAX(IdBur) FROM Bure), 0) + 1);
+SELECT setval('boca_ser_br_seq', COALESCE((SELECT MAX(SerBr) FROM Boca), 0) + 1);
