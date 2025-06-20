@@ -1,8 +1,10 @@
 package ftn.bp2.ui;
 
 import ftn.bp2.service.ReportService;
+import ftn.bp2.service.TransactionService;
 import ftn.bp2.service.VinogradService;
 import ftn.bp2.dto.VinogradDTO;
+import ftn.bp2.util.InputHandler;
 
 import java.sql.SQLException;
 import java.time.LocalDate;
@@ -15,18 +17,22 @@ public class VinarijaUIHandler {
     private final Scanner scanner;
     private final VinogradService vinogradService;
     private final ReportService reportService;
+    private final TransactionService transactionService;
+    private final InputHandler inputHandler;
 
     public VinarijaUIHandler() {
         this.scanner = new Scanner(System.in);
         this.vinogradService = new VinogradService();
         this.reportService = new ReportService();
+        this.transactionService = new TransactionService();
+        this.inputHandler = new InputHandler();
     }
 
     public void start() {
         System.out.println("=== DOBRODOŠLI U SISTEM VINARIJE ===");
         while (true) {
             displayMainMenu();
-            int choice = getIntInput("Izaberite opciju: ");
+            int choice = inputHandler.getIntInput("Izaberite opciju: ");
 
             try {
                 switch (choice) {
@@ -37,7 +43,7 @@ public class VinarijaUIHandler {
                         handleReportOperations();
                         break;
                     case 3:
-
+                        handleTransactionOperations();
                         break;
                     case 0:
                         System.out.println("Hvala što ste koristili sistem vinarije!");
@@ -61,10 +67,9 @@ public class VinarijaUIHandler {
             System.out.println("3. Dodaj novi vinograd");
             System.out.println("4. Ažuriraj vinograd");
             System.out.println("5. Obriši vinograd");
-            System.out.println("6. Prikaži podređene vinograde");
             System.out.println("0. Nazad");
 
-            int choice = getIntInput("Izaberite opciju: ");
+            int choice = inputHandler.getIntInput("Izaberite opciju: ");
 
             switch (choice) {
                 case 1:
@@ -82,9 +87,6 @@ public class VinarijaUIHandler {
                 case 5:
                     deleteVinograd();
                     break;
-                case 6:
-                    displayChildVinogradi();
-                    break;
                 case 0:
                     return;
                 default:
@@ -97,12 +99,11 @@ public class VinarijaUIHandler {
         while (true) {
             System.out.println("\n=== IZVEŠTAJI ===");
             System.out.println("1. Broj vina po sorti grožđa");
-            System.out.println("2. Analiza berbi i zaposlenih po vinogradu");
-            System.out.println("3. Analiza performansi zaposlenih");
-            System.out.println("4. Analiza porudžbina sa detaljima");
+            System.out.println("2. Analiza prodaja vina sa sortama grožđa");
+            System.out.println("3. Analiza kupaca i preferencija");
             System.out.println("0. Nazad");
 
-            int choice = getIntInput("Izaberite opciju: ");
+            int choice = inputHandler.getIntInput("Izaberite opciju: ");
 
             switch (choice) {
                 case 1:
@@ -113,10 +114,39 @@ public class VinarijaUIHandler {
                     }
                     break;
                 case 2:
+                    try {
+                        displayWineSalesWithGrapeVarieties();
+                    } catch (Exception e) {
+                        System.err.println("Greška prilikom generisanja izveštaja: " + e.getMessage());
+                    }
                     break;
                 case 3:
+                    try {
+                        displayCustomerAnalysisReport();
+                    } catch (Exception e) {
+                        System.err.println("Greška prilikom generisanja izveštaja: " + e.getMessage());
+                    }
                     break;
-                case 4:
+                case 0:
+
+                    return;
+                default:
+                    System.out.println("Nevažeća opcija.");
+            }
+        }
+    }
+
+    private void handleTransactionOperations() throws Exception {
+        while (true) {
+            System.out.println("\n=== TRANSAKCIJE ===");
+            System.out.println("1. Kompletna narudžba kupca (novi kupac + narudžba + boca)");
+            System.out.println("0. Nazad");
+
+            int choice = inputHandler.getIntInput("Izaberite opciju: ");
+
+            switch (choice) {
+                case 1:
+                    handleCustomerOrderTransaction();
                     break;
                 case 0:
                     return;
@@ -147,6 +177,121 @@ public class VinarijaUIHandler {
         }
     }
 
+    private void displayWineSalesWithGrapeVarieties() throws Exception {
+        List<Map<String, Object>> results = reportService.getWineSalesWithGrapeVarieties();
+
+        System.out.println("\n=== ANALIZA PRODAJE VINA SA SORTAMA GROŽĐA ===");
+        System.out.printf("%-30s %-25s %-12s %-15s%n",
+                "Naziv Vina", "Sorte Grožđa", "Ukupno Boca", "Ukupan Prihod (€)");
+        System.out.println("-".repeat(85));
+
+        for (Map<String, Object> row : results) {
+            System.out.printf("%-30s %-25s %-12d %-15.2f%n",
+                    row.get("nazivVina"),
+                    row.get("sorteGrozdja"),
+                    row.get("ukupnoBoca"),
+                    row.get("ukupanPrihod"));
+        }
+
+        if (results.isEmpty()) {
+            System.out.println("Nema podataka za prikaz.");
+        } else {
+            System.out.println("-".repeat(85));
+            System.out.println("Ukupno vina: " + results.size());
+        }
+    }
+
+    private void displayCustomerAnalysisReport() throws Exception {
+        List<Map<String, Object>> results = reportService.getCustomerAnalysisReport();
+
+        System.out.println("\n=== ANALIZA KUPACA I PREFERENCIJA ===");
+        System.out.printf("%-30s %-15s %-30s %-15s%n",
+                "Email Kupca", "Različita Vina", "Omiljene Sorte Grožđa", "Broj Narudžbi");
+        System.out.println("-".repeat(95));
+
+        for (Map<String, Object> row : results) {
+            System.out.printf("%-30s %-15d %-30s %-15d%n",
+                    row.get("email"),
+                    row.get("razlicitaVina"),
+                    row.get("omiljeneSorte"),
+                    row.get("brojNarduzbi"));
+        }
+
+        if (results.isEmpty()) {
+            System.out.println("Nema podataka za prikaz.");
+        } else {
+            System.out.println("-".repeat(95));
+            System.out.println("Ukupno kupaca: " + results.size());
+
+            // Calculate summary statistics
+            int totalOrders = results.stream()
+                    .mapToInt(row -> (Integer) row.get("brojNarduzbi"))
+                    .sum();
+
+            double avgWinesPerCustomer = results.stream()
+                    .mapToDouble(row -> (Integer) row.get("razlicitaVina"))
+                    .average()
+                    .orElse(0.0);
+
+            double avgOrdersPerCustomer = results.stream()
+                    .mapToDouble(row -> (Integer) row.get("brojNarduzbi"))
+                    .average()
+                    .orElse(0.0);
+
+            System.out.printf("Ukupan broj narudžbi: %d%n", totalOrders);
+            System.out.printf("Prosečan broj različitih vina po kupcu: %.1f%n", avgWinesPerCustomer);
+            System.out.printf("Prosečan broj narudžbi po kupcu: %.1f%n", avgOrdersPerCustomer);
+        }
+    }
+    private void handleCustomerOrderTransaction() throws Exception {
+        System.out.println("\n=== KOMPLETNA NARUDŽBA KUPCA ===");
+        System.out.println("Ova transakcija će kreirati novog kupca, narudžbu i dodati bocu vina.");
+
+        // Get customer information
+        String email = inputHandler.getStringInput("Unesite email kupca: ");
+        String phoneNumber = inputHandler.getStringInput("Unesite broj telefona kupca: ");
+        String paymentMethod = inputHandler.getStringInput("Unesite način plaćanja (kartica/kes/ček): ");
+        Integer wineId = inputHandler.getIntInput("Unesite ID vina: ");
+        Float bottleCapacity = inputHandler.getFloatInput("Unesite zapreminu boce (L): ");
+
+        // Validate inputs
+        if (email == null || phoneNumber == null || paymentMethod == null ||
+                wineId == null || bottleCapacity == null) {
+            System.out.println("Greška: Svi podaci su obavezni.");
+            return;
+        }
+
+        if (bottleCapacity <= 0 || bottleCapacity > 10.0f) {
+            System.out.println("Greška: Zapremina boce mora biti između 0 i 10 litara.");
+            return;
+        }
+
+        if (!paymentMethod.matches("kartica|kes|ček")) {
+            System.out.println("Greška: Način plaćanja mora biti 'kartica', 'kes' ili 'ček'.");
+            return;
+        }
+
+        try {
+            Map<String, Object> result = transactionService.executeCustomerOrderTransaction(
+                    email, phoneNumber, paymentMethod, wineId, bottleCapacity);
+
+            if ((Boolean) result.get("success")) {
+                System.out.println("✓ Transakcija uspešno izvršena!");
+                System.out.println("  - Novi kupac kreiran sa ID: " + result.get("customerId"));
+                System.out.println("  - Nova narudžba kreirana sa ID: " + result.get("orderId"));
+                System.out.println("  - Boca vina dodana u narudžbu");
+                System.out.println("  - Poruka: " + result.get("message"));
+            } else {
+                System.out.println("✗ Transakcija nije uspešna.");
+                System.out.println("  - Greška: " + result.get("error"));
+            }
+        } catch (SQLException e) {
+            System.out.println("✗ Greška pri izvršavanju transakcije: " + e.getMessage());
+            if (e.getMessage().contains("violates foreign key constraint")) {
+                System.out.println("  - Proverite da li ID vina postoji u bazi podataka.");
+            }
+        }
+    }
     // Vinograd operations
     private void displayAllVinogradi() throws Exception {
         List<VinogradDTO> vinogradi = vinogradService.getAllVinogradi();
@@ -162,7 +307,7 @@ public class VinarijaUIHandler {
     }
 
     private void findVinogradById() throws Exception {
-        int id = getIntInput("Unesite ID vinograda: ");
+        int id = inputHandler.getIntInput("Unesite ID vinograda: ");
         VinogradDTO vinograd = vinogradService.getVinogradById(id);
 
         if (vinograd != null) {
@@ -183,15 +328,15 @@ public class VinarijaUIHandler {
         System.out.print("Naziv: ");
         String naziv = scanner.nextLine();
 
-        Float povrsina = getFloatInput("Površina: ");
+        Float povrsina = inputHandler.getFloatInput("Površina: ");
 
         System.out.print("Datum osnivanja (YYYY-MM-DD): ");
         String datumStr = scanner.nextLine();
         LocalDate datumOsnivanja = LocalDate.parse(datumStr);
 
-        Float kapacitet = getFloatInput("Kapacitet: ");
+        Float kapacitet = inputHandler.getFloatInput("Kapacitet: ");
 
-        Integer parentId = getOptionalIntInput("Parent vinograd ID (0 za glavni vinograd): ");
+        Integer parentId = inputHandler.getOptionalIntInput("Parent vinograd ID (0 za glavni vinograd): ");
         if (parentId != null && parentId == 0) {
             parentId = null;
         }
@@ -212,7 +357,7 @@ public class VinarijaUIHandler {
     }
 
     private void updateVinograd() throws Exception {
-        int id = getIntInput("Unesite ID vinograda za ažuriranje: ");
+        int id = inputHandler.getIntInput("Unesite ID vinograda za ažuriranje: ");
         VinogradDTO vinograd = vinogradService.getVinogradById(id);
 
         if (vinograd == null) {
@@ -228,7 +373,7 @@ public class VinarijaUIHandler {
             vinograd.setImeV(naziv);
         }
 
-        Float povrsina = getOptionalFloatInput("Nova površina (Enter za zadržavanje): ");
+        Float povrsina = inputHandler.getOptionalFloatInput("Nova površina (Enter za zadržavanje): ");
         if (povrsina != null) {
             vinograd.setPoV(povrsina);
         }
@@ -242,7 +387,7 @@ public class VinarijaUIHandler {
     }
 
     private void deleteVinograd() throws Exception {
-        int id = getIntInput("Unesite ID vinograda za brisanje: ");
+        int id = inputHandler.getIntInput("Unesite ID vinograda za brisanje: ");
 
         System.out.print("Da li ste sigurni? (da/ne): ");
         String confirm = scanner.nextLine();
@@ -264,77 +409,4 @@ public class VinarijaUIHandler {
             System.out.println("Brisanje otkazano.");
         }
     }
-
-    private void displayChildVinogradi() throws Exception {
-        int parentId = getIntInput("Unesite ID roditeljskog vinograda: ");
-
-        try {
-            List<VinogradDTO> childVinogradi = vinogradService.getVinogradiByParentId(parentId);
-
-            System.out.println("\n=== PODREĐENI VINOGRADI ===");
-            if (childVinogradi.isEmpty()) {
-                System.out.println("Nema podređenih vinograda.");
-            } else {
-                for (VinogradDTO vinograd : childVinogradi) {
-                    System.out.printf("ID: %d | Naziv: %s | Površina: %.2f | Kapacitet: %.2f%n",
-                            vinograd.getIdV(), vinograd.getImeV(), vinograd.getPoV(), vinograd.getVKap());
-                }
-            }
-        } catch (SQLException e) {
-            System.out.println("Greška pri pristupu bazi podataka: " + e.getMessage());
-            System.out.println("Proverite da li vinograd sa ID " + parentId + " postoji.");
-        } catch (Exception e) {
-            System.out.println("Greška: " + e.getMessage());
-        }
-    }
-
-
-    private int getIntInput(String prompt) {
-        System.out.print(prompt);
-        while (!scanner.hasNextInt()) {
-            System.out.print("Unesite validan broj: ");
-            scanner.next();
-        }
-        int value = scanner.nextInt();
-        scanner.nextLine(); // consume newline
-        return value;
-    }
-
-    private Integer getOptionalIntInput(String prompt) {
-        System.out.print(prompt);
-        String input = scanner.nextLine().trim();
-        if (input.isEmpty()) {
-            return null;
-        }
-        try {
-            return Integer.parseInt(input);
-        } catch (NumberFormatException e) {
-            return null;
-        }
-    }
-
-    private float getFloatInput(String prompt) {
-        System.out.print(prompt);
-        while (!scanner.hasNextFloat()) {
-            System.out.print("Unesite validan decimalni broj: ");
-            scanner.next();
-        }
-        float value = scanner.nextFloat();
-        scanner.nextLine(); // consume newline
-        return value;
-    }
-
-    private Float getOptionalFloatInput(String prompt) {
-        System.out.print(prompt);
-        String input = scanner.nextLine().trim();
-        if (input.isEmpty()) {
-            return null;
-        }
-        try {
-            return Float.parseFloat(input);
-        } catch (NumberFormatException e) {
-            return null;
-        }
-    }
-
 }

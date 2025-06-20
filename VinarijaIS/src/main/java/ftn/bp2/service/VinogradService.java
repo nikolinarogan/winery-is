@@ -26,13 +26,6 @@ public class VinogradService {
         return vinogradDAO.findById(id);
     }
 
-    public List<VinogradDTO> getVinogradiByParentId(Integer parentId) throws SQLException {
-        if (parentId == null) {
-            throw new IllegalArgumentException("Parent ID ne može biti null");
-        }
-        return vinogradDAO.findByParentId(parentId);
-    }
-
     public Integer createVinograd(VinogradDTO vinograd) throws SQLException {
         validateVinograd(vinograd);
 
