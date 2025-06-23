@@ -5,7 +5,6 @@ A comprehensive Java-based wine management system for wineries.
 ## 🍷 Features
 
 ### Core Functionality
-- **Vineyard Management**: CRUD operations for vineyards with hierarchical structure
 - **Wine Production Tracking**: Complete wine lifecycle from grape to bottle
 - **Customer Management**: Customer registration with unique email validation
 - **Order Processing**: Transactional order system with atomic operations
