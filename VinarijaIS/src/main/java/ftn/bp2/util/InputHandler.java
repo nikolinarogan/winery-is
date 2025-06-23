@@ -58,14 +58,15 @@ public class InputHandler {
         }
     }
 
-    public String getStringInput(String prompt) {
+    public double getDoubleInput(String prompt) {
         System.out.print(prompt);
-        String input = scanner.nextLine().trim();
-        if (input.isEmpty()) {
-            return null;
+        while (!scanner.hasNextDouble()) {
+            System.out.print("Unesite validan decimalni broj: ");
+            scanner.next();
         }
-        return input;
+        double value = scanner.nextDouble();
+        scanner.nextLine(); // consume newline
+        return value;
     }
-
 
 }

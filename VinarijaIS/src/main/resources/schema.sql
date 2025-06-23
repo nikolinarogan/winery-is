@@ -60,7 +60,7 @@ CREATE TABLE Degustacija (
 
 CREATE TABLE Kupac (
                        IdKup INTEGER PRIMARY KEY DEFAULT nextval('kupac_id_seq'),
-                       Email VARCHAR(150),
+                       Email VARCHAR(150) NOT NULL UNIQUE,
                        BrTel VARCHAR(30)
 );
 
