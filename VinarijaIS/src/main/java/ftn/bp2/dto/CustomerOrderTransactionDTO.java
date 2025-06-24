@@ -10,7 +10,6 @@ public class CustomerOrderTransactionDTO {
     private Float bottleCapacity;
     private LocalDate orderDate;
 
-    // Constructors
     public CustomerOrderTransactionDTO() {}
 
     public CustomerOrderTransactionDTO(String email, String phoneNumber, String paymentMethod, 
@@ -33,7 +32,6 @@ public class CustomerOrderTransactionDTO {
         this.orderDate = orderDate;
     }
 
-    // Getters and Setters
     public String getEmail() { return email; }
     public void setEmail(String email) { this.email = email; }
 

@@ -78,7 +78,6 @@ public class Porudzbina {
         switch (pltMtd.toLowerCase()) {
             case "kartica": return "Kartica";
             case "kes": return "Kes";
-            case "ček": return "Ček";
             default: return pltMtd;
         }
     }

@@ -55,7 +55,7 @@ public class VinarijaUIHandler {
             System.out.println("\n=== IZVEŠTAJI ===");
             System.out.println("1. Broj vina po sorti grožđa");
             System.out.println("2. Analiza prodaja vina sa sortama grožđa");
-            System.out.println("3. Analiza kupaca i preferencija (DTO-DAO-Service-UI)");
+            System.out.println("3. Analiza kupaca i preferencija");
             System.out.println("0. Nazad");
 
             int choice = inputHandler.getIntInput("Izaberite opciju: ");

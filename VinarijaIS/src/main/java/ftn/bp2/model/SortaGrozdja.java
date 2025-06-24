@@ -28,8 +28,7 @@ public class SortaGrozdja {
         this.opis = opis;
         this.boja = boja;
     }
-
-    // Getters and Setters
+    
     public Integer getIdSrt() {
         return idSrt;
     }

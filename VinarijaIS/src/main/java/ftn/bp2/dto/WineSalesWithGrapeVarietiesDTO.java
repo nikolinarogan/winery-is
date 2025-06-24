@@ -6,7 +6,6 @@ public class WineSalesWithGrapeVarietiesDTO {
     private Integer ukupnoBoca;
     private Double ukupanPrihod;
 
-    // Constructors
     public WineSalesWithGrapeVarietiesDTO() {}
 
     public WineSalesWithGrapeVarietiesDTO(String nazivVina, String sorteGrozdja, Integer ukupnoBoca, Double ukupanPrihod) {
@@ -16,7 +15,6 @@ public class WineSalesWithGrapeVarietiesDTO {
         this.ukupanPrihod = ukupanPrihod;
     }
 
-    // Getters and Setters
     public String getNazivVina() { return nazivVina; }
     public void setNazivVina(String nazivVina) { this.nazivVina = nazivVina; }
 

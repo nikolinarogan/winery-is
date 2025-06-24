@@ -15,25 +15,21 @@ public class CustomerOrderTransactionService {
     }
 
     public TransactionResultDTO executeCustomerOrderTransaction(CustomerOrderTransactionDTO transaction) throws SQLException {
-        // Validate transaction data
         TransactionResultDTO validationResult = validateTransaction(transaction);
         if (!validationResult.isSuccess()) {
             return validationResult;
         }
 
-        // Check if wine exists
         if (!customerOrderTransactionDAO.validateWineExists(transaction.getWineId())) {
             return new TransactionResultDTO(false, "Wine not found", "Wine with ID " + transaction.getWineId() + " does not exist");
         }
 
-        // Check if customer already exists - email must be unique
         boolean customerExists = customerOrderTransactionDAO.validateCustomerEmailExists(transaction.getEmail());
         if (customerExists) {
             return new TransactionResultDTO(false, "Customer already exists", 
                 "Customer with email " + transaction.getEmail() + " already exists. Email must be unique.");
         }
 
-        // Execute the transaction
         return customerOrderTransactionDAO.executeCustomerOrderTransaction(transaction);
     }
 
@@ -46,7 +42,7 @@ public class CustomerOrderTransactionService {
     }
 
     private TransactionResultDTO validateTransaction(CustomerOrderTransactionDTO transaction) {
-        // Validate email
+
         if (transaction.getEmail() == null || transaction.getEmail().trim().isEmpty()) {
             return new TransactionResultDTO(false, "Email is required", "Email cannot be empty");
         }
@@ -55,7 +51,6 @@ public class CustomerOrderTransactionService {
             return new TransactionResultDTO(false, "Invalid email format", "Email format is not valid");
         }
 
-        // Validate phone number
         if (transaction.getPhoneNumber() == null || transaction.getPhoneNumber().trim().isEmpty()) {
             return new TransactionResultDTO(false, "Phone number is required", "Phone number cannot be empty");
         }
@@ -64,7 +59,6 @@ public class CustomerOrderTransactionService {
             return new TransactionResultDTO(false, "Invalid phone number format", "Phone number format is not valid");
         }
 
-        // Validate payment method
         if (transaction.getPaymentMethod() == null || transaction.getPaymentMethod().trim().isEmpty()) {
             return new TransactionResultDTO(false, "Payment method is required", "Payment method cannot be empty");
         }
@@ -73,12 +67,10 @@ public class CustomerOrderTransactionService {
             return new TransactionResultDTO(false, "Invalid payment method", "Payment method must be one of: cash, card, transfer");
         }
 
-        // Validate wine ID
         if (transaction.getWineId() == null || transaction.getWineId() <= 0) {
             return new TransactionResultDTO(false, "Valid wine ID is required", "Wine ID must be a positive number");
         }
 
-        // Validate bottle capacity
         if (transaction.getBottleCapacity() == null || transaction.getBottleCapacity() <= 0) {
             return new TransactionResultDTO(false, "Valid bottle capacity is required", "Bottle capacity must be a positive number");
         }

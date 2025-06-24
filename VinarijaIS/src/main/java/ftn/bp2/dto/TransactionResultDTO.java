@@ -8,7 +8,7 @@ public class TransactionResultDTO {
     private Integer orderId;
     private Integer bottleId;
 
-    // Constructors
+
     public TransactionResultDTO() {}
 
     public TransactionResultDTO(boolean success, String message) {
@@ -29,7 +29,6 @@ public class TransactionResultDTO {
         this.orderId = orderId;
     }
 
-    // Getters and Setters
     public boolean isSuccess() { return success; }
     public void setSuccess(boolean success) { this.success = success; }
 

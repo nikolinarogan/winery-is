@@ -6,7 +6,6 @@ public class CustomerAnalysisReportDTO {
     private String omiljeneSorte;
     private Integer brojNarduzbi;
 
-    // Constructors
     public CustomerAnalysisReportDTO() {}
 
     public CustomerAnalysisReportDTO(String email, Integer razlicitaVina, String omiljeneSorte, Integer brojNarduzbi) {
@@ -16,7 +15,6 @@ public class CustomerAnalysisReportDTO {
         this.brojNarduzbi = brojNarduzbi;
     }
 
-    // Getters and Setters
     public String getEmail() { return email; }
     public void setEmail(String email) { this.email = email; }
 

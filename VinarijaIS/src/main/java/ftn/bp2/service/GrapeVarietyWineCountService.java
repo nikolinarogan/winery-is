@@ -17,31 +17,7 @@ public class GrapeVarietyWineCountService {
         return grapeVarietyWineCountDAO.getGrapeVarietyWineCount();
     }
 
-    public List<GrapeVarietyWineCountDTO> getGrapeVarietyWineCountByColor(String color) throws SQLException {
-        if (color == null || color.trim().isEmpty()) {
-            throw new IllegalArgumentException("Boja ne može biti prazna");
-        }
-        return grapeVarietyWineCountDAO.getGrapeVarietyWineCountByColor(color);
-    }
 
-    public List<GrapeVarietyWineCountDTO> getGrapeVarietyWineCountByName(String name) throws SQLException {
-        if (name == null || name.trim().isEmpty()) {
-            throw new IllegalArgumentException("Naziv sorte grožđa ne može biti prazan");
-        }
-        return grapeVarietyWineCountDAO.getGrapeVarietyWineCountByName(name);
-    }
-
-    public List<GrapeVarietyWineCountDTO> getRedGrapeVarietyWineCount() throws SQLException {
-        return grapeVarietyWineCountDAO.getGrapeVarietyWineCountByColor("crvena");
-    }
-
-    public List<GrapeVarietyWineCountDTO> getWhiteGrapeVarietyWineCount() throws SQLException {
-        return grapeVarietyWineCountDAO.getGrapeVarietyWineCountByColor("bela");
-    }
-
-    public List<GrapeVarietyWineCountDTO> getRoseGrapeVarietyWineCount() throws SQLException {
-        return grapeVarietyWineCountDAO.getGrapeVarietyWineCountByColor("roze");
-    }
 
     public GrapeVarietyWineCountDTO getMostUsedGrapeVariety() throws SQLException {
         List<GrapeVarietyWineCountDTO> allVarieties = grapeVarietyWineCountDAO.getGrapeVarietyWineCount();

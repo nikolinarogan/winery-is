@@ -17,21 +17,8 @@ public class InputHandler {
             scanner.next();
         }
         int value = scanner.nextInt();
-        scanner.nextLine(); // consume newline
+        scanner.nextLine();
         return value;
-    }
-
-    public Integer getOptionalIntInput(String prompt) {
-        System.out.print(prompt);
-        String input = scanner.nextLine().trim();
-        if (input.isEmpty()) {
-            return null;
-        }
-        try {
-            return Integer.parseInt(input);
-        } catch (NumberFormatException e) {
-            return null;
-        }
     }
 
     public float getFloatInput(String prompt) {
@@ -41,22 +28,10 @@ public class InputHandler {
             scanner.next();
         }
         float value = scanner.nextFloat();
-        scanner.nextLine(); // consume newline
+        scanner.nextLine();
         return value;
     }
 
-    public Float getOptionalFloatInput(String prompt) {
-        System.out.print(prompt);
-        String input = scanner.nextLine().trim();
-        if (input.isEmpty()) {
-            return null;
-        }
-        try {
-            return Float.parseFloat(input);
-        } catch (NumberFormatException e) {
-            return null;
-        }
-    }
 
     public double getDoubleInput(String prompt) {
         System.out.print(prompt);
@@ -65,7 +40,7 @@ public class InputHandler {
             scanner.next();
         }
         double value = scanner.nextDouble();
-        scanner.nextLine(); // consume newline
+        scanner.nextLine();
         return value;
     }
 

@@ -10,9 +10,7 @@ import java.time.LocalDate;
 public class CustomerOrderTransactionDAO {
 
 
-    // Transaction: Complete customer order workflow
-    // Purpose: Create new customer, order, and add wine bottles in a single transaction
-    // Tables: Kupac (INSERT) + Narudzba (INSERT) + Boca (INSERT) - 3 tables minimum
+    // Tables: Kupac (INSERT) + Narudzba (INSERT) + Boca (INSERT)
     public TransactionResultDTO executeCustomerOrderTransaction(CustomerOrderTransactionDTO transaction) throws SQLException {
         Connection conn = null;
         TransactionResultDTO result = new TransactionResultDTO();
@@ -21,21 +19,18 @@ public class CustomerOrderTransactionDAO {
             conn = DatabaseConnection.getConnection();
             conn.setAutoCommit(false);
 
-            // Step 1: Insert a new customer
             Integer customerId = insertCustomer(conn, transaction);
             if (customerId == null) {
                 conn.rollback();
                 return new TransactionResultDTO(false, "Failed to create customer", "Failed to create customer");
             }
 
-            // Step 2: Insert a new order for that customer
             Integer orderId = insertOrder(conn, transaction, customerId);
             if (orderId == null) {
                 conn.rollback();
                 return new TransactionResultDTO(false, "Failed to create order", "Failed to create order");
             }
 
-            // Step 3: Insert a new bottle of wine into the order
             Integer bottleId = insertBottle(conn, transaction, orderId);
             if (bottleId == null) {
                 conn.rollback();
