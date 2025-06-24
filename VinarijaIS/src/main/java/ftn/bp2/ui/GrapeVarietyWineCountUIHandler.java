@@ -54,18 +54,19 @@ public class GrapeVarietyWineCountUIHandler {
         List<GrapeVarietyWineCountDTO> results = grapeVarietyWineCountService.getGrapeVarietyWineCount();
 
         System.out.println("\n=== BROJ VINA PO SORTI GROŽĐA ===");
-        System.out.printf("%-30s %-15s%n", "Sorta grožđa", "Broj vina");
-        System.out.println("-".repeat(45));
+        System.out.printf("%-30s %-15s %-20s%n", "Sorta grožđa", "Broj vina", "Godina najstarijeg vina");
+        System.out.println("-".repeat(65));
 
         if (results.isEmpty()) {
             System.out.println("Nema podataka za prikaz.");
         } else {
             for (GrapeVarietyWineCountDTO result : results) {
-                System.out.printf("%-30s %-15d%n",
+                System.out.printf("%-30s %-15d %-20d%n",
                         result.getGrapeVariety(),
-                        result.getNumberOfWines());
+                        result.getNumberOfWines(),
+                        result.getOldestWineYear());
             }
-            System.out.println("-".repeat(45));
+            System.out.println("-".repeat(65));
             System.out.println("Ukupno sorti: " + results.size());
         }
     }
