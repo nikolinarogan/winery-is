@@ -1,16 +1,18 @@
 package ftn.bp2.dao;
 
+import ftn.bp2.dto.BottleInfoDTO;
 import ftn.bp2.dto.CustomerOrderTransactionDTO;
 import ftn.bp2.dto.TransactionResultDTO;
 import ftn.bp2.util.DatabaseConnection;
 
 import java.sql.*;
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 
 public class CustomerOrderTransactionDAO {
 
-
-    // Tables: Kupac (INSERT) + Narudzba (INSERT) + Boca (INSERT)
+    // Tables: Kupac (INSERT) + Narudzba (INSERT) + Boca (UPDATE)
     public TransactionResultDTO executeCustomerOrderTransaction(CustomerOrderTransactionDTO transaction) throws SQLException {
         Connection conn = null;
         TransactionResultDTO result = new TransactionResultDTO();
@@ -31,10 +33,10 @@ public class CustomerOrderTransactionDAO {
                 return new TransactionResultDTO(false, "Failed to create order", "Failed to create order");
             }
 
-            Integer bottleId = insertBottle(conn, transaction, orderId);
-            if (bottleId == null) {
+            boolean bottlesAssigned = assignBottlesToOrder(conn, transaction, orderId);
+            if (!bottlesAssigned) {
                 conn.rollback();
-                return new TransactionResultDTO(false, "Failed to add bottle to order", "Failed to add bottle to order");
+                return new TransactionResultDTO(false, "Failed to assign bottles to order", "Failed to assign bottles to order");
             }
 
             conn.commit();
@@ -72,10 +74,9 @@ public class CustomerOrderTransactionDAO {
                 }
             }
         } catch (SQLException e) {
-            // Check if this is a unique constraint violation
             if (e.getMessage().toLowerCase().contains("unique") || 
                 e.getMessage().toLowerCase().contains("duplicate") ||
-                e.getSQLState().equals("23505")) { // PostgreSQL unique constraint violation
+                e.getSQLState().equals("23505")) {
                 throw new SQLException("Customer with email " + transaction.getEmail() + " already exists. Email must be unique.", e);
             }
             throw e;
@@ -104,25 +105,124 @@ public class CustomerOrderTransactionDAO {
         return null;
     }
 
-    private Integer insertBottle(Connection conn, CustomerOrderTransactionDTO transaction, Integer orderId) throws SQLException {
-        String insertBottleSql = """
-            INSERT INTO Boca (KapBoc, Vino_IdVina, Narudzba_IdNar) 
-            VALUES (?, ?, ?)
-            RETURNING SerBr
+    private boolean assignBottlesToOrder(Connection conn, CustomerOrderTransactionDTO transaction, Integer orderId) throws SQLException {
+        if (transaction.getBottleSerialNumbers() == null || transaction.getBottleSerialNumbers().isEmpty()) {
+            throw new SQLException("No bottles selected for purchase");
+        }
+
+        String updateBottleSql = """
+            UPDATE Boca 
+            SET Narudzba_IdNar = ? 
+            WHERE SerBr = ? AND Narudzba_IdNar IS NULL
             """;
 
-        try (PreparedStatement stmt = conn.prepareStatement(insertBottleSql)) {
-            stmt.setFloat(1, transaction.getBottleCapacity());
-            stmt.setInt(2, transaction.getWineId());
-            stmt.setInt(3, orderId);
-
-            try (ResultSet rs = stmt.executeQuery()) {
-                if (rs.next()) {
-                    return rs.getInt("SerBr");
+        try (PreparedStatement stmt = conn.prepareStatement(updateBottleSql)) {
+            for (Integer serialNumber : transaction.getBottleSerialNumbers()) {
+                stmt.setInt(1, orderId);
+                stmt.setInt(2, serialNumber);
+                
+                int rowsAffected = stmt.executeUpdate();
+                if (rowsAffected == 0) {
+                    throw new SQLException("Bottle with serial number " + serialNumber + " is not available (already sold or doesn't exist)");
                 }
             }
         }
-        return null;
+        return true;
+    }
+
+    public List<BottleInfoDTO> getAvailableBottles() throws SQLException {
+        String sql = """
+            SELECT b.SerBr, b.KapBoc, b.Vino_IdVina, v.NazVina, b.Narudzba_IdNar
+            FROM Boca b
+            LEFT JOIN Vino v ON b.Vino_IdVina = v.IdVina
+            WHERE b.Narudzba_IdNar IS NULL
+            ORDER BY b.SerBr
+            """;
+
+        List<BottleInfoDTO> bottles = new ArrayList<>();
+
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql);
+             ResultSet rs = stmt.executeQuery()) {
+
+            while (rs.next()) {
+                BottleInfoDTO bottle = new BottleInfoDTO(
+                    rs.getInt("SerBr"),
+                    rs.getFloat("KapBoc"),
+                    rs.getInt("Vino_IdVina"),
+                    rs.getString("NazVina"),
+                    rs.getObject("Narudzba_IdNar", Integer.class)
+                );
+                bottles.add(bottle);
+            }
+        }
+        return bottles;
+    }
+
+    public List<BottleInfoDTO> getBottlesByWineId(Integer wineId) throws SQLException {
+        String sql = """
+            SELECT b.SerBr, b.KapBoc, b.Vino_IdVina, v.NazVina, b.Narudzba_IdNar
+            FROM Boca b
+            LEFT JOIN Vino v ON b.Vino_IdVina = v.IdVina
+            WHERE b.Vino_IdVina = ? AND b.Narudzba_IdNar IS NULL
+            ORDER BY b.SerBr
+            """;
+
+        List<BottleInfoDTO> bottles = new ArrayList<>();
+
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setInt(1, wineId);
+
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    BottleInfoDTO bottle = new BottleInfoDTO(
+                        rs.getInt("SerBr"),
+                        rs.getFloat("KapBoc"),
+                        rs.getInt("Vino_IdVina"),
+                        rs.getString("NazVina"),
+                        rs.getObject("Narudzba_IdNar", Integer.class)
+                    );
+                    bottles.add(bottle);
+                }
+            }
+        }
+        return bottles;
+    }
+
+    public boolean validateBottleExists(Integer serialNumber) throws SQLException {
+        String sql = "SELECT COUNT(*) FROM Boca WHERE SerBr = ?";
+
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setInt(1, serialNumber);
+
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt(1) > 0;
+                }
+            }
+        }
+        return false;
+    }
+
+    public boolean validateBottleAvailable(Integer serialNumber) throws SQLException {
+        String sql = "SELECT COUNT(*) FROM Boca WHERE SerBr = ? AND Narudzba_IdNar IS NULL";
+
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setInt(1, serialNumber);
+
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt(1) > 0;
+                }
+            }
+        }
+        return false;
     }
 
     public boolean validateWineExists(Integer wineId) throws SQLException {

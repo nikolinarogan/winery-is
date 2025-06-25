@@ -6,8 +6,6 @@ public class TransactionResultDTO {
     private String error;
     private Integer customerId;
     private Integer orderId;
-    private Integer bottleId;
-
 
     public TransactionResultDTO() {}
 
@@ -44,9 +42,6 @@ public class TransactionResultDTO {
     public Integer getOrderId() { return orderId; }
     public void setOrderId(Integer orderId) { this.orderId = orderId; }
 
-    public Integer getBottleId() { return bottleId; }
-    public void setBottleId(Integer bottleId) { this.bottleId = bottleId; }
-
     @Override
     public String toString() {
         return "TransactionResultDTO{" +
@@ -55,7 +50,6 @@ public class TransactionResultDTO {
                 ", error='" + error + '\'' +
                 ", customerId=" + customerId +
                 ", orderId=" + orderId +
-                ", bottleId=" + bottleId +
                 '}';
     }
 } 

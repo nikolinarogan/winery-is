@@ -1,34 +1,32 @@
 package ftn.bp2.dto;
 
 import java.time.LocalDate;
+import java.util.List;
 
 public class CustomerOrderTransactionDTO {
     private String email;
     private String phoneNumber;
     private String paymentMethod;
-    private Integer wineId;
-    private Float bottleCapacity;
+    private List<Integer> bottleSerialNumbers; // List of existing bottle serial numbers to purchase
     private LocalDate orderDate;
 
     public CustomerOrderTransactionDTO() {}
 
     public CustomerOrderTransactionDTO(String email, String phoneNumber, String paymentMethod, 
-                                     Integer wineId, Float bottleCapacity) {
+                                     List<Integer> bottleSerialNumbers) {
         this.email = email;
         this.phoneNumber = phoneNumber;
         this.paymentMethod = paymentMethod;
-        this.wineId = wineId;
-        this.bottleCapacity = bottleCapacity;
+        this.bottleSerialNumbers = bottleSerialNumbers;
         this.orderDate = LocalDate.now();
     }
 
     public CustomerOrderTransactionDTO(String email, String phoneNumber, String paymentMethod, 
-                                     Integer wineId, Float bottleCapacity, LocalDate orderDate) {
+                                     List<Integer> bottleSerialNumbers, LocalDate orderDate) {
         this.email = email;
         this.phoneNumber = phoneNumber;
         this.paymentMethod = paymentMethod;
-        this.wineId = wineId;
-        this.bottleCapacity = bottleCapacity;
+        this.bottleSerialNumbers = bottleSerialNumbers;
         this.orderDate = orderDate;
     }
 
@@ -41,11 +39,8 @@ public class CustomerOrderTransactionDTO {
     public String getPaymentMethod() { return paymentMethod; }
     public void setPaymentMethod(String paymentMethod) { this.paymentMethod = paymentMethod; }
 
-    public Integer getWineId() { return wineId; }
-    public void setWineId(Integer wineId) { this.wineId = wineId; }
-
-    public Float getBottleCapacity() { return bottleCapacity; }
-    public void setBottleCapacity(Float bottleCapacity) { this.bottleCapacity = bottleCapacity; }
+    public List<Integer> getBottleSerialNumbers() { return bottleSerialNumbers; }
+    public void setBottleSerialNumbers(List<Integer> bottleSerialNumbers) { this.bottleSerialNumbers = bottleSerialNumbers; }
 
     public LocalDate getOrderDate() { return orderDate; }
     public void setOrderDate(LocalDate orderDate) { this.orderDate = orderDate; }
@@ -56,8 +51,7 @@ public class CustomerOrderTransactionDTO {
                 "email='" + email + '\'' +
                 ", phoneNumber='" + phoneNumber + '\'' +
                 ", paymentMethod='" + paymentMethod + '\'' +
-                ", wineId=" + wineId +
-                ", bottleCapacity=" + bottleCapacity +
+                ", bottleSerialNumbers=" + bottleSerialNumbers +
                 ", orderDate=" + orderDate +
                 '}';
     }

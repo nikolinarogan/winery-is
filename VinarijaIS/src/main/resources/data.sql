@@ -116,12 +116,14 @@ INSERT INTO Kupac (IdKup, Email, BrTel) VALUES
 
 -- Insert orders
 INSERT INTO Narudzba (IdNar, DatNar, PltMtd, Kupac_IdKup) VALUES
-                                                              (1, '2024-01-15', 'kartica', 1),
-                                                              (2, '2024-01-20', 'gotovina', 2),
-                                                              (3, '2024-02-01', 'kartica', 3),
-                                                              (4, '2024-02-05', 'gotovina', 4),
-                                                              (5, '2024-02-10', 'kartica', 5),
-                                                              (6, '2024-02-15', 'gotovina', 6);
+                                                              (1, '2024-01-15', 'karticno placanje', 1),
+                                                              (2, '2024-01-20', 'gotovinsko placanje', 2),
+                                                              (3, '2024-02-01', 'karticno placanje', 3),
+                                                              (4, '2024-02-05', 'gotovinsko placanje', 4),
+                                                              (5, '2024-02-10', 'gotovinsko placanje', 5),
+                                                              (6, '2024-02-15', 'karticno placanje', 6),
+                                                              (7, '2024-02-20', 'gotovinsko placanje', 4),
+                                                              (8, '2024-03-01', 'karticno placanje', 2);
 
 -- Insert cellars
 INSERT INTO Podrum (IdPod, PodTmp, PodVl, KapPod) VALUES
@@ -132,35 +134,51 @@ INSERT INTO Podrum (IdPod, PodTmp, PodVl, KapPod) VALUES
 
 -- Insert barrels
 INSERT INTO Bure (IdBur, KapBur, GodPr, Vino_IdVina, Podrum_IdPod) VALUES
-                                                                       (1, NULL, '2022-03-01', 1, 1),
-                                                                       (2, NULL, '2021-04-15', 2, 1),
-                                                                       (3, NULL, '2023-02-20', 3, 2),
-                                                                       (4, NULL, '2022-05-10', 4, 2),
-                                                                       (5, NULL, '2023-01-30', 5, 3),
-                                                                       (6, NULL, '2021-06-25', 6, 3),
-                                                                       (7, NULL, '2023-03-15', 7, 4),
-                                                                       (8, NULL, '2022-07-05', 8, 4);
+(1, 50, '2023-09-15', 1, 1),
+(2, 100, '2022-09-16', 2, 2),
+(3, 20, '2021-09-17', 3, 3),
+(4, 10, '2020-09-18', 4, 4),
+(5, 50, '2019-09-19', 5, 1),
+(6, 100, '2018-09-20', 6, 2),
+(7, 20, '2017-09-21', 7, 3),
+(8, 10, '2016-09-22', 8, 4);
+
 
 -- Insert bottles
 INSERT INTO Boca (SerBr, KapBoc, Vino_IdVina, Narudzba_IdNar) VALUES
-                                                                  (1, 0.75, 1, 1),
-                                                                  (2, 0.75, 1, 1),
-                                                                  (3, 0.75, 3, 1),
-                                                                  (4, 0.75, 2, 2),
-                                                                  (5, 0.75, 5, 2),
-                                                                  (6, 0.75, 4, 3),
-                                                                  (7, 0.75, 4, 3),
-                                                                  (8, 0.75, 6, 3),
-                                                                  (9, 0.75, 8, 3),
-                                                                  (10, 0.75, 7, 4),
-                                                                  (11, 0.75, 7, 4),
-                                                                  (12, 0.75, 1, 5),
-                                                                  (13, 0.75, 1, 5),
-                                                                  (14, 0.75, 1, 5),
-                                                                  (15, 0.75, 2, 5),
-                                                                  (16, 0.75, 3, 6),
-                                                                  (17, 0.75, 3, 6),
-                                                                  (18, 0.75, 5, 6);
+(1, 0.5, 1, 1),
+(2, 0.75, 1, 1),
+(3, 1.0, 3, 1),
+(4, 1.5, 2, 2),
+(5, 0.5, 5, 2),
+(6, 0.75, 4, 3),
+(7, 1.0, 4, 3),
+(8, 1.5, 6, 3),
+(9, 0.5, 8, 3),
+(10, 0.75, 7, 4),
+(11, 1.0, 7, 4),
+(12, 1.5, 1, 5),
+(13, 0.5, 1, 5),
+(14, 0.75, 1, 5),
+(15, 1.0, 2, 5),
+(16, 1.5, 3, 6),
+(17, 0.5, 3, 6),
+(18, 1.0, 5, 6);
+
+-- Insert additional bottles available for purchase (not assigned to any order)
+INSERT INTO Boca (SerBr, KapBoc, Vino_IdVina, Narudzba_IdNar) VALUES
+(19, 0.75, 1, NULL), -- Available Merlot bottle
+(20, 1.0, 2, NULL),  -- Available Cabernet bottle
+(21, 0.5, 3, NULL),  -- Available Chardonnay bottle
+(22, 1.5, 4, NULL),  -- Available Pinot Noir bottle
+(23, 0.75, 5, NULL), -- Available Sauvignon Blanc bottle
+(24, 1.0, 6, NULL),  -- Available Syrah bottle
+(25, 0.5, 7, NULL),  -- Available Riesling bottle
+(26, 1.5, 8, NULL),  -- Available Malbec bottle
+(27, 0.75, 1, NULL), -- Another available Merlot bottle
+(28, 1.0, 2, NULL),  -- Another available Cabernet bottle
+(29, 0.5, 3, NULL),  -- Another available Chardonnay bottle
+(30, 1.5, 4, NULL);  -- Another available Pinot Noir bottle
 
 -- Insert wine tastings
 INSERT INTO Degustacija (IdDeg, DatDeg, KapDeg) VALUES
@@ -182,3 +200,16 @@ INSERT INTO se_prezentuje (Vino_IdVina, Degustacija_IdDeg) VALUES
                                                                (4, 2), (5, 2), -- Degustacija 2: Pinot Noir, Sauvignon
                                                                (6, 3), (7, 3), (8, 3), -- Degustacija 3: Syrah, Riesling, Malbec
                                                                (1, 4), (3, 4); -- Degustacija 4: Merlot, Chardonnay
+
+-- Initialize sequences to start after existing data
+SELECT setval('kupac_id_seq', (SELECT COALESCE(MAX(IdKup), 0) + 1 FROM Kupac));
+SELECT setval('narudzba_id_seq', (SELECT COALESCE(MAX(IdNar), 0) + 1 FROM Narudzba));
+SELECT setval('boca_serbr_seq', (SELECT COALESCE(MAX(SerBr), 0) + 1 FROM Boca));
+SELECT setval('vino_id_seq', (SELECT COALESCE(MAX(IdVina), 0) + 1 FROM Vino));
+SELECT setval('sorta_grozdja_id_seq', (SELECT COALESCE(MAX(IdSrt), 0) + 1 FROM Sorta_Grozdja));
+SELECT setval('vinograd_id_seq', (SELECT COALESCE(MAX(IdV), 0) + 1 FROM Vinograd));
+SELECT setval('zaposleni_id_seq', (SELECT COALESCE(MAX(IdZap), 0) + 1 FROM Zaposleni));
+SELECT setval('berba_id_seq', (SELECT COALESCE(MAX(IdBer), 0) + 1 FROM Berba));
+SELECT setval('degustacija_id_seq', (SELECT COALESCE(MAX(IdDeg), 0) + 1 FROM Degustacija));
+SELECT setval('podrum_id_seq', (SELECT COALESCE(MAX(IdPod), 0) + 1 FROM Podrum));
+SELECT setval('bure_id_seq', (SELECT COALESCE(MAX(IdBur), 0) + 1 FROM Bure));

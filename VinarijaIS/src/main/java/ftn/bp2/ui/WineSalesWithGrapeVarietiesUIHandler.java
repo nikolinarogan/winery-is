@@ -54,21 +54,21 @@ public class WineSalesWithGrapeVarietiesUIHandler {
         List<WineSalesWithGrapeVarietiesDTO> results = wineSalesWithGrapeVarietiesService.getWineSalesWithGrapeVarieties();
 
         System.out.println("\n=== ANALIZA PRODAJE VINA SA SORTAMA GROŽĐA ===");
-        System.out.printf("%-30s %-25s %-12s %-15s%n",
-                "Naziv Vina", "Sorte Grožđa", "Ukupno Boca", "Ukupan Prihod (€)");
-        System.out.println("-".repeat(85));
+        System.out.printf("%-30s %-45s %-12s %-20s%n",
+                "Naziv Vina", "Sorte Grožđa", "Ukupno Boca", "Broj jedinstvenih kupaca");
+        System.out.println("-".repeat(120));
 
         if (results.isEmpty()) {
             System.out.println("Nema podataka za prikaz.");
         } else {
             for (WineSalesWithGrapeVarietiesDTO result : results) {
-                System.out.printf("%-30s %-25s %-12d %-15.2f%n",
+                System.out.printf("%-30s %-45s %-12d %-20d%n",
                         result.getNazivVina(),
                         result.getSorteGrozdja(),
                         result.getUkupnoBoca(),
-                        result.getUkupanPrihod());
+                        result.getUniqueCustomerCount());
             }
-            System.out.println("-".repeat(85));
+            System.out.println("-".repeat(120));
             System.out.println("Ukupno vina: " + results.size());
         }
     }

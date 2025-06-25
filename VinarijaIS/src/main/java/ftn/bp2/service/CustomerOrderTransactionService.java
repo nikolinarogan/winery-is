@@ -1,10 +1,12 @@
 package ftn.bp2.service;
 
 import ftn.bp2.dao.CustomerOrderTransactionDAO;
+import ftn.bp2.dto.BottleInfoDTO;
 import ftn.bp2.dto.CustomerOrderTransactionDTO;
 import ftn.bp2.dto.TransactionResultDTO;
 
 import java.sql.SQLException;
+import java.util.List;
 import java.util.regex.Pattern;
 
 public class CustomerOrderTransactionService {
@@ -20,8 +22,17 @@ public class CustomerOrderTransactionService {
             return validationResult;
         }
 
-        if (!customerOrderTransactionDAO.validateWineExists(transaction.getWineId())) {
-            return new TransactionResultDTO(false, "Wine not found", "Wine with ID " + transaction.getWineId() + " does not exist");
+        // Validate that all selected bottles exist and are available
+        for (Integer serialNumber : transaction.getBottleSerialNumbers()) {
+            if (!customerOrderTransactionDAO.validateBottleExists(serialNumber)) {
+                return new TransactionResultDTO(false, "Bottle not found", 
+                    "Bottle with serial number " + serialNumber + " does not exist");
+            }
+            
+            if (!customerOrderTransactionDAO.validateBottleAvailable(serialNumber)) {
+                return new TransactionResultDTO(false, "Bottle not available", 
+                    "Bottle with serial number " + serialNumber + " is already sold or not available");
+            }
         }
 
         boolean customerExists = customerOrderTransactionDAO.validateCustomerEmailExists(transaction.getEmail());
@@ -34,21 +45,38 @@ public class CustomerOrderTransactionService {
     }
 
     public TransactionResultDTO executeCustomerOrderTransaction(String email, String phoneNumber, 
-                                                              String paymentMethod, Integer wineId, 
-                                                              Float bottleCapacity) throws SQLException {
-        CustomerOrderTransactionDTO transaction = new CustomerOrderTransactionDTO(
-                email, phoneNumber, paymentMethod, wineId, bottleCapacity);
+                                                              String paymentMethod, List<Integer> bottleSerialNumbers) throws SQLException {
+        CustomerOrderTransactionDTO transaction = new CustomerOrderTransactionDTO(email, phoneNumber, paymentMethod, bottleSerialNumbers);
         return executeCustomerOrderTransaction(transaction);
     }
 
+    public List<BottleInfoDTO> getAvailableBottles() throws SQLException {
+        return customerOrderTransactionDAO.getAvailableBottles();
+    }
+
+    public List<BottleInfoDTO> getBottlesByWineId(Integer wineId) throws SQLException {
+        if (wineId == null || wineId <= 0) {
+            throw new SQLException("Invalid wine ID");
+        }
+        
+        if (!customerOrderTransactionDAO.validateWineExists(wineId)) {
+            throw new SQLException("Wine with ID " + wineId + " does not exist");
+        }
+        
+        return customerOrderTransactionDAO.getBottlesByWineId(wineId);
+    }
+
     private TransactionResultDTO validateTransaction(CustomerOrderTransactionDTO transaction) {
+        if (transaction == null) {
+            return new TransactionResultDTO(false, "Transaction data is required", "Transaction cannot be null");
+        }
 
         if (transaction.getEmail() == null || transaction.getEmail().trim().isEmpty()) {
-            return new TransactionResultDTO(false, "Email is required", "Email cannot be empty");
+            return new TransactionResultDTO(false, "Email is required", "Customer email cannot be empty");
         }
 
         if (!isValidEmail(transaction.getEmail())) {
-            return new TransactionResultDTO(false, "Invalid email format", "Email format is not valid");
+            return new TransactionResultDTO(false, "Invalid email format", "Please enter a valid email address");
         }
 
         if (transaction.getPhoneNumber() == null || transaction.getPhoneNumber().trim().isEmpty()) {
@@ -56,7 +84,7 @@ public class CustomerOrderTransactionService {
         }
 
         if (!isValidPhoneNumber(transaction.getPhoneNumber())) {
-            return new TransactionResultDTO(false, "Invalid phone number format", "Phone number format is not valid");
+            return new TransactionResultDTO(false, "Invalid phone number format", "Please enter a valid phone number");
         }
 
         if (transaction.getPaymentMethod() == null || transaction.getPaymentMethod().trim().isEmpty()) {
@@ -64,19 +92,18 @@ public class CustomerOrderTransactionService {
         }
 
         if (!isValidPaymentMethod(transaction.getPaymentMethod())) {
-            return new TransactionResultDTO(false, "Invalid payment method", "Payment method must be one of: cash, card, transfer");
+            return new TransactionResultDTO(false, "Invalid payment method", 
+                "Payment method must be 'karticno placanje' or 'gotovinsko placanje'");
         }
 
-        if (transaction.getWineId() == null || transaction.getWineId() <= 0) {
-            return new TransactionResultDTO(false, "Valid wine ID is required", "Wine ID must be a positive number");
+        if (transaction.getBottleSerialNumbers() == null || transaction.getBottleSerialNumbers().isEmpty()) {
+            return new TransactionResultDTO(false, "Bottles selection is required", "At least one bottle must be selected");
         }
 
-        if (transaction.getBottleCapacity() == null || transaction.getBottleCapacity() <= 0) {
-            return new TransactionResultDTO(false, "Valid bottle capacity is required", "Bottle capacity must be a positive number");
-        }
-
-        if (transaction.getBottleCapacity() > 10.0f) {
-            return new TransactionResultDTO(false, "Bottle capacity too large", "Bottle capacity cannot exceed 10 liters");
+        // Check for duplicate bottle selections
+        long uniqueBottles = transaction.getBottleSerialNumbers().stream().distinct().count();
+        if (uniqueBottles != transaction.getBottleSerialNumbers().size()) {
+            return new TransactionResultDTO(false, "Duplicate bottles selected", "Each bottle can only be selected once");
         }
 
         return new TransactionResultDTO(true, "Validation successful");
@@ -89,7 +116,6 @@ public class CustomerOrderTransactionService {
     }
 
     private boolean isValidPhoneNumber(String phoneNumber) {
-        // Basic phone number validation - can be customized based on requirements
         String phoneRegex = "^[+]?[0-9\\s\\-\\(\\)]{7,15}$";
         Pattern pattern = Pattern.compile(phoneRegex);
         return pattern.matcher(phoneNumber).matches();
@@ -97,9 +123,8 @@ public class CustomerOrderTransactionService {
 
     private boolean isValidPaymentMethod(String paymentMethod) {
         String lowerPaymentMethod = paymentMethod.toLowerCase();
-        return lowerPaymentMethod.equals("cash") || 
-               lowerPaymentMethod.equals("card") || 
-               lowerPaymentMethod.equals("transfer");
+        return lowerPaymentMethod.equals("karticno placanje") ||
+               lowerPaymentMethod.equals("gotovinsko placanje");
     }
 
     public boolean validateWineExists(Integer wineId) throws SQLException {
@@ -123,15 +148,17 @@ public class CustomerOrderTransactionService {
         return customerOrderTransactionDAO.getCustomerIdByEmail(email);
     }
 
-    public TransactionResultDTO validateTransactionData(String email, String phoneNumber, 
-                                                       String paymentMethod, Integer wineId, 
-                                                       Float bottleCapacity) {
-        CustomerOrderTransactionDTO transaction = new CustomerOrderTransactionDTO(
-                email, phoneNumber, paymentMethod, wineId, bottleCapacity);
-        return validateTransaction(transaction);
+    public boolean validateBottleExists(Integer serialNumber) throws SQLException {
+        if (serialNumber == null || serialNumber <= 0) {
+            return false;
+        }
+        return customerOrderTransactionDAO.validateBottleExists(serialNumber);
     }
 
-    public CustomerOrderTransactionDAO getCustomerOrderTransactionDAO() {
-        return customerOrderTransactionDAO;
+    public boolean validateBottleAvailable(Integer serialNumber) throws SQLException {
+        if (serialNumber == null || serialNumber <= 0) {
+            return false;
+        }
+        return customerOrderTransactionDAO.validateBottleAvailable(serialNumber);
     }
 } 

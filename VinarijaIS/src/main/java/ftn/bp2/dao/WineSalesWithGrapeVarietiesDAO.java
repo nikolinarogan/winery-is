@@ -18,7 +18,7 @@ public class WineSalesWithGrapeVarietiesDAO {
                 v.NazVina AS NazivVina,
                 STRING_AGG(DISTINCT sg.NazSrt, ', ') AS SorteGrozdja,
                 COUNT(b.SerBr) AS UkupnoBoca,
-                ROUND(CAST(SUM(b.KapBoc * 2) AS NUMERIC), 2) AS UkupanPrihod
+                COUNT(DISTINCT k.IdKup) AS UniqueCustomerCount
             FROM 
                 Vino v
             JOIN 
@@ -36,7 +36,7 @@ public class WineSalesWithGrapeVarietiesDAO {
             HAVING 
                 COUNT(b.SerBr) > 0
             ORDER BY 
-                UkupanPrihod DESC
+                UniqueCustomerCount DESC
             """;
 
         try (Connection conn = DatabaseConnection.getConnection();
@@ -52,14 +52,11 @@ public class WineSalesWithGrapeVarietiesDAO {
     }
 
     private WineSalesWithGrapeVarietiesDTO mapResultSetToDTO(ResultSet rs) throws SQLException {
-        Object ukupanPrihodObj = rs.getObject("UkupanPrihod");
-        Double ukupanPrihod = ukupanPrihodObj != null ? ((Number) ukupanPrihodObj).doubleValue() : null;
-
         return new WineSalesWithGrapeVarietiesDTO(
                 rs.getString("NazivVina"),
                 rs.getString("SorteGrozdja"),
                 rs.getInt("UkupnoBoca"),
-                ukupanPrihod
+                rs.getInt("UniqueCustomerCount")
         );
     }
 } 

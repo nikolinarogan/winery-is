@@ -4,15 +4,15 @@ public class WineSalesWithGrapeVarietiesDTO {
     private String nazivVina;
     private String sorteGrozdja;
     private Integer ukupnoBoca;
-    private Double ukupanPrihod;
+    private Integer uniqueCustomerCount;
 
     public WineSalesWithGrapeVarietiesDTO() {}
 
-    public WineSalesWithGrapeVarietiesDTO(String nazivVina, String sorteGrozdja, Integer ukupnoBoca, Double ukupanPrihod) {
+    public WineSalesWithGrapeVarietiesDTO(String nazivVina, String sorteGrozdja, Integer ukupnoBoca, Integer uniqueCustomerCount) {
         this.nazivVina = nazivVina;
         this.sorteGrozdja = sorteGrozdja;
         this.ukupnoBoca = ukupnoBoca;
-        this.ukupanPrihod = ukupanPrihod;
+        this.uniqueCustomerCount = uniqueCustomerCount;
     }
 
     public String getNazivVina() { return nazivVina; }
@@ -24,8 +24,13 @@ public class WineSalesWithGrapeVarietiesDTO {
     public Integer getUkupnoBoca() { return ukupnoBoca; }
     public void setUkupnoBoca(Integer ukupnoBoca) { this.ukupnoBoca = ukupnoBoca; }
 
-    public Double getUkupanPrihod() { return ukupanPrihod; }
-    public void setUkupanPrihod(Double ukupanPrihod) { this.ukupanPrihod = ukupanPrihod; }
+    public Integer getUniqueCustomerCount() {
+        return uniqueCustomerCount;
+    }
+
+    public void setUniqueCustomerCount(Integer uniqueCustomerCount) {
+        this.uniqueCustomerCount = uniqueCustomerCount;
+    }
 
     @Override
     public String toString() {
@@ -33,7 +38,7 @@ public class WineSalesWithGrapeVarietiesDTO {
                 "nazivVina='" + nazivVina + '\'' +
                 ", sorteGrozdja='" + sorteGrozdja + '\'' +
                 ", ukupnoBoca=" + ukupnoBoca +
-                ", ukupanPrihod=" + ukupanPrihod +
+                ", uniqueCustomerCount=" + uniqueCustomerCount +
                 '}';
     }
 } 
