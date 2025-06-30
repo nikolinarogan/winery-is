@@ -92,18 +92,16 @@ INSERT INTO Radi (poljoprivrednik_IdZap, Vinograd_IdV) VALUES
                                                            (8, 3), (8, 8); -- Sofija Ristić radi u Vršac i Sektor B
 
 -- Insert harvest participation (FIXED: Only valid combinations that exist in Radi table)
-INSERT INTO se_angazuje (Berba_IdBer, Berba_Vinograd_IdV, Radi_poljoprivrednik_IdZap, Radi_Vinograd_IdV) VALUES
-                                                                                                             (1, 1, 1, 1), -- Berba 1 u Fruška Gora, Milan Petrović
-                                                                                                             (1, 1, 8, 3), -- Berba 1 u Fruška Gora, Sofija Ristić (iz Vršac)
-                                                                                                             (2, 2, 1, 1), -- Berba 2 u Sremski Karlovci, Milan Petrović (works in parent vineyard)
-                                                                                                             (3, 3, 3, 3), -- Berba 3 u Vršac, Dragan Nikolić
-                                                                                                             (4, 4, 1, 1), -- Berba 4 u Subotica, Milan Petrović (works in parent vineyard)
-                                                                                                             (5, 5, 5, 5), -- Berba 5 u Smederevo, Stefan Đorđević
-                                                                                                             (6, 6, 6, 6), -- Berba 6 u Negotinska Krajina, Marija Pavlović
-                                                                                                             (7, 7, 1, 1), -- Berba 7 u Sektor A, Milan Petrović
-                                                                                                             (8, 8, 8, 8), -- Berba 8 u Sektor B, Sofija Ristić
-                                                                                                             (9, 1, 1, 1), -- Berba 9 u Fruška Gora, Milan Petrović
-                                                                                                             (10, 2, 1, 1); -- Berba 10 u Sremski Karlovci, Milan Petrović
+INSERT INTO se_angazuje (Berba_IdBer, Vinograd_IdV, Radi_poljoprivrednik_IdZap) VALUES
+                                                                                    (1, 1, 1),
+                                                                                    (3, 3, 3),
+                                                                                    (3, 3, 8),
+                                                                                    (5, 5, 5),
+                                                                                    (6, 6, 6),
+                                                                                    (7, 7, 1),
+                                                                                    (8, 8, 8),
+                                                                                    (9, 1, 1);
+
 
 -- Insert customers
 INSERT INTO Kupac (IdKup, Email, BrTel) VALUES
