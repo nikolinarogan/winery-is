@@ -28,36 +28,43 @@ A comprehensive Java-based wine management system for wineries.
 ## 📊 Available Reports
 
 ### 1. Grape Variety Wine Count
-- **Purpose**: Shows how many wines are made from each grape variety
-- **Access**: Main Menu → Reports → Grape Variety Wine Count
-- **Features**: 
-  - Filter by grape variety
-  - Sort by wine count
-  - Export functionality
+This report shows a list of all grape varieties in your winery and tells you how many different wines are made from each variety.  
+**Purpose:** Helps you see which grape varieties are most commonly used in your wine production and which ones are less represented.
+
+---
 
 ### 2. Wine Sales with Grape Varieties
-- **Purpose**: Analyzes wine sales performance by grape variety
-- **Access**: Main Menu → Reports → Wine Sales with Grape Varieties
-- **Features**:
-  - Revenue analysis
-  - Bottle count tracking
-  - Grape variety performance comparison
+This report analyzes your wine sales by showing, for each wine and its associated grape variety, how many bottles have been sold.  
+**Purpose:** Helps you understand which grape varieties and wines are most popular with customers, and which contribute most to your sales.
+
+---
 
 ### 3. Customer Analysis Report
-- **Purpose**: Customer behavior and preference analysis
-- **Access**: Main Menu → Reports → Customer Analysis
-- **Features**:
-  - Customer segmentation
-  - Preference analysis
-  - Order frequency tracking
+This report provides insights into your customers’ behavior. For each customer, it shows how many orders they have placed and what their favorite wines are (based on their order history).  
+**Purpose:** Helps you identify your most loyal customers, understand their preferences, and tailor marketing or loyalty programs accordingly.
 
-## 💳 Transaction System
+---
 
-### Customer Order Transaction
-- **Purpose**: Complete customer order workflow (customer + order + bottle)
-- **Access**: Main Menu → Transactions → Customer Order
-- **Features**:
-  - Atomic transaction with rollback support
-  - Email uniqueness validation
-  - Comprehensive data validation
-  - Real-time error feedback
+## 🔄 Transaction Flow: New Customer Order
+
+**How a customer order transaction works:**
+
+1. **Customer Entry:**  
+   The user enters a new customer’s email and phone number. The system checks that the email is unique.
+
+2. **Payment Method:**  
+   The user selects how the customer will pay (cash or card).
+
+3. **Bottle Selection:**  
+   The system displays all bottles that are available for sale. The user selects one or more bottles for the order.
+
+4. **Validation:**  
+   The system checks that all selected bottles are available, the customer email is unique, and all information is valid.
+
+5. **Transaction Execution:**  
+   - A new customer is created (if the email is unique).
+   - A new order is created and linked to the customer.
+   - The selected bottles are assigned to the order (they become “sold”).
+   - If any step fails, the whole transaction is cancelled (no partial changes).
+
+
