@@ -11,6 +11,7 @@ public class VinarijaUIHandler {
     private final WineSalesWithGrapeVarietiesUIHandler wineSalesWithGrapeVarietiesUIHandler;
     private final CustomerAnalysisReportUIHandler customerAnalysisReportUIHandler;
     private final CustomerOrderTransactionUIHandler customerOrderTransactionUIHandler;
+    private final GrapeVarietyBarrelCellarUIHandler grapeVarietyBarrelCellarUIHandler;
 
     public VinarijaUIHandler() {
         this.scanner = new Scanner(System.in);
@@ -19,6 +20,7 @@ public class VinarijaUIHandler {
         this.wineSalesWithGrapeVarietiesUIHandler = new WineSalesWithGrapeVarietiesUIHandler();
         this.customerAnalysisReportUIHandler = new CustomerAnalysisReportUIHandler();
         this.customerOrderTransactionUIHandler = new CustomerOrderTransactionUIHandler();
+        this.grapeVarietyBarrelCellarUIHandler = new GrapeVarietyBarrelCellarUIHandler();
     }
 
     public void start() {
@@ -56,6 +58,7 @@ public class VinarijaUIHandler {
             System.out.println("1. Broj vina po sorti grožđa");
             System.out.println("2. Analiza prodaja vina sa sortama grožđa");
             System.out.println("3. Analiza kupaca i preferencija");
+            System.out.println("4. Analiza buradi i podruma po sorti grožđa");
             System.out.println("0. Nazad");
 
             int choice = inputHandler.getIntInput("Izaberite opciju: ");
@@ -78,6 +81,13 @@ public class VinarijaUIHandler {
                 case 3:
                     try {
                         customerAnalysisReportUIHandler.start();
+                    } catch (Exception e) {
+                        System.err.println("Greška prilikom generisanja izveštaja: " + e.getMessage());
+                    }
+                    break;
+                case 4:
+                    try {
+                        grapeVarietyBarrelCellarUIHandler.displayGrapeVarietyBarrelCellarStats();
                     } catch (Exception e) {
                         System.err.println("Greška prilikom generisanja izveštaja: " + e.getMessage());
                     }
