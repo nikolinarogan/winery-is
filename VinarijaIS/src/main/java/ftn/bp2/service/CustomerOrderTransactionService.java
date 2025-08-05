@@ -7,7 +7,9 @@ import ftn.bp2.dto.TransactionResultDTO;
 
 import java.sql.SQLException;
 import java.util.List;
+import java.util.Map;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 public class CustomerOrderTransactionService {
     private final CustomerOrderTransactionDAO customerOrderTransactionDAO;
@@ -22,7 +24,7 @@ public class CustomerOrderTransactionService {
             return validationResult;
         }
 
-        // Validate that all selected bottles exist and are available
+        // Validacija za boce
         for (Integer serialNumber : transaction.getBottleSerialNumbers()) {
             if (!customerOrderTransactionDAO.validateBottleExists(serialNumber)) {
                 return new TransactionResultDTO(false, "Bottle not found", 
@@ -51,7 +53,10 @@ public class CustomerOrderTransactionService {
     }
 
     public List<BottleInfoDTO> getAvailableBottles() throws SQLException {
-        return customerOrderTransactionDAO.getAvailableBottles();
+        List<Map<String, Object>> rawData = customerOrderTransactionDAO.getAvailableBottlesData();
+        return rawData.stream()
+                .map(this::mapToBottleInfoDTO)
+                .collect(Collectors.toList());
     }
 
     public List<BottleInfoDTO> getBottlesByWineId(Integer wineId) throws SQLException {
@@ -63,7 +68,20 @@ public class CustomerOrderTransactionService {
             throw new SQLException("Wine with ID " + wineId + " does not exist");
         }
         
-        return customerOrderTransactionDAO.getBottlesByWineId(wineId);
+        List<Map<String, Object>> rawData = customerOrderTransactionDAO.getBottlesByWineIdData(wineId);
+        return rawData.stream()
+                .map(this::mapToBottleInfoDTO)
+                .collect(Collectors.toList());
+    }
+
+    private BottleInfoDTO mapToBottleInfoDTO(Map<String, Object> row) {
+        return new BottleInfoDTO(
+                (Integer) row.get("SerBr"),
+                (Float) row.get("KapBoc"),
+                (Integer) row.get("Vino_IdVina"),
+                (String) row.get("NazVina"),
+                (Integer) row.get("Narudzba_IdNar")
+        );
     }
 
     private TransactionResultDTO validateTransaction(CustomerOrderTransactionDTO transaction) {
@@ -84,7 +102,7 @@ public class CustomerOrderTransactionService {
         }
 
         if (!isValidPhoneNumber(transaction.getPhoneNumber())) {
-            return new TransactionResultDTO(false, "Invalid phone number format", "Please enter a valid phone number");
+            return new TransactionResultDTO(false, "Invalid phone number format (7-15 characters, + optional)", "Please enter a valid phone number");
         }
 
         if (transaction.getPaymentMethod() == null || transaction.getPaymentMethod().trim().isEmpty()) {
@@ -100,7 +118,7 @@ public class CustomerOrderTransactionService {
             return new TransactionResultDTO(false, "Bottles selection is required", "At least one bottle must be selected");
         }
 
-        // Check for duplicate bottle selections
+        // da ne selektuje istu bocu 2x
         long uniqueBottles = transaction.getBottleSerialNumbers().stream().distinct().count();
         if (uniqueBottles != transaction.getBottleSerialNumbers().size()) {
             return new TransactionResultDTO(false, "Duplicate bottles selected", "Each bottle can only be selected once");
@@ -127,13 +145,6 @@ public class CustomerOrderTransactionService {
                lowerPaymentMethod.equals("gotovinsko placanje");
     }
 
-    public boolean validateWineExists(Integer wineId) throws SQLException {
-        if (wineId == null || wineId <= 0) {
-            return false;
-        }
-        return customerOrderTransactionDAO.validateWineExists(wineId);
-    }
-
     public boolean validateCustomerEmailExists(String email) throws SQLException {
         if (email == null || email.trim().isEmpty()) {
             return false;
@@ -146,19 +157,5 @@ public class CustomerOrderTransactionService {
             return null;
         }
         return customerOrderTransactionDAO.getCustomerIdByEmail(email);
-    }
-
-    public boolean validateBottleExists(Integer serialNumber) throws SQLException {
-        if (serialNumber == null || serialNumber <= 0) {
-            return false;
-        }
-        return customerOrderTransactionDAO.validateBottleExists(serialNumber);
-    }
-
-    public boolean validateBottleAvailable(Integer serialNumber) throws SQLException {
-        if (serialNumber == null || serialNumber <= 0) {
-            return false;
-        }
-        return customerOrderTransactionDAO.validateBottleAvailable(serialNumber);
     }
 } 

@@ -5,6 +5,8 @@ import ftn.bp2.dto.GrapeVarietyWineCountDTO;
 
 import java.sql.SQLException;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 public class GrapeVarietyWineCountService {
     private final GrapeVarietyWineCountDAO grapeVarietyWineCountDAO;
@@ -14,45 +16,18 @@ public class GrapeVarietyWineCountService {
     }
 
     public List<GrapeVarietyWineCountDTO> getGrapeVarietyWineCount() throws SQLException {
-        return grapeVarietyWineCountDAO.getGrapeVarietyWineCount();
+        List<Map<String, Object>> rawData = grapeVarietyWineCountDAO.getGrapeVarietyWineCountData();
+        return rawData.stream()
+                .map(this::mapToDTO)
+                .collect(Collectors.toList());
     }
 
-
-
-    public GrapeVarietyWineCountDTO getMostUsedGrapeVariety() throws SQLException {
-        List<GrapeVarietyWineCountDTO> allVarieties = grapeVarietyWineCountDAO.getGrapeVarietyWineCount();
-        if (allVarieties.isEmpty()) {
-            return null;
-        }
-        return allVarieties.get(0);
-    }
-
-    public GrapeVarietyWineCountDTO getLeastUsedGrapeVariety() throws SQLException {
-        List<GrapeVarietyWineCountDTO> allVarieties = grapeVarietyWineCountDAO.getGrapeVarietyWineCount();
-        if (allVarieties.isEmpty()) {
-            return null;
-        }
-        return allVarieties.get(allVarieties.size() - 1); // Last element has least count
-    }
-
-    public Integer getTotalWineCount() throws SQLException {
-        List<GrapeVarietyWineCountDTO> allVarieties = grapeVarietyWineCountDAO.getGrapeVarietyWineCount();
-        return allVarieties.stream()
-                .mapToInt(GrapeVarietyWineCountDTO::getNumberOfWines)
-                .sum();
-    }
-
-    public Double getAverageWinesPerVariety() throws SQLException {
-        List<GrapeVarietyWineCountDTO> allVarieties = grapeVarietyWineCountDAO.getGrapeVarietyWineCount();
-        if (allVarieties.isEmpty()) {
-            return 0.0;
-        }
-        
-        double totalWines = allVarieties.stream()
-                .mapToInt(GrapeVarietyWineCountDTO::getNumberOfWines)
-                .sum();
-        
-        return totalWines / allVarieties.size();
+    private GrapeVarietyWineCountDTO mapToDTO(Map<String, Object> row) {
+        return new GrapeVarietyWineCountDTO(
+                (String) row.get("Grape_Variety"),
+                (Integer) row.get("Number_of_Wines"),
+                (Integer) row.get("oldest_wine_year")
+        );
     }
 
     public GrapeVarietyWineCountDAO getGrapeVarietyWineCountDAO() {

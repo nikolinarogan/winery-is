@@ -1,18 +1,18 @@
 package ftn.bp2.dao;
 
-import ftn.bp2.dto.GrapeVarietyWineCountDTO;
 import ftn.bp2.util.DatabaseConnection;
 
 import java.sql.*;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class GrapeVarietyWineCountDAO {
 
-
     //Za svaku sortu ispisujem broj vina u kojima se ona nalazi kao i najstarije proizvedeno vino u kome je sorta ucestvovala, kako bi se stekao uvid u tradiciju najpopularnijih sorti
-    public List<GrapeVarietyWineCountDTO> getGrapeVarietyWineCount() throws SQLException {
-        List<GrapeVarietyWineCountDTO> results = new ArrayList<>();
+    public List<Map<String, Object>> getGrapeVarietyWineCountData() throws SQLException {
+        List<Map<String, Object>> results = new ArrayList<>();
 
         String sql = """
             SELECT sg.NazSrt AS Grape_Variety, 
@@ -30,19 +30,14 @@ public class GrapeVarietyWineCountDAO {
              ResultSet rs = stmt.executeQuery()) {
 
             while (rs.next()) {
-                results.add(mapResultSetToDTO(rs));
+                Map<String, Object> row = new HashMap<>();
+                row.put("Grape_Variety", rs.getString("Grape_Variety"));
+                row.put("Number_of_Wines", rs.getInt("Number_of_Wines"));
+                row.put("oldest_wine_year", rs.getInt("oldest_wine_year"));
+                results.add(row);
             }
         }
 
         return results;
-    }
-
-
-    private GrapeVarietyWineCountDTO mapResultSetToDTO(ResultSet rs) throws SQLException {
-        return new GrapeVarietyWineCountDTO(
-                rs.getString("Grape_Variety"),
-                rs.getInt("Number_of_Wines"),
-                rs.getInt("oldest_wine_year")
-        );
     }
 } 

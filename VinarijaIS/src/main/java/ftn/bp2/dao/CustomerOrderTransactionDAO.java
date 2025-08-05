@@ -1,6 +1,5 @@
 package ftn.bp2.dao;
 
-import ftn.bp2.dto.BottleInfoDTO;
 import ftn.bp2.dto.CustomerOrderTransactionDTO;
 import ftn.bp2.dto.TransactionResultDTO;
 import ftn.bp2.util.DatabaseConnection;
@@ -8,11 +7,13 @@ import ftn.bp2.util.DatabaseConnection;
 import java.sql.*;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class CustomerOrderTransactionDAO {
 
-    // Tables: Kupac (INSERT) + Narudzba (INSERT) + Boca (UPDATE)
+    // Tables: Kupac (INSERT) + Narudzba (INSERT) + Boca (UPDATE), skroz novi kupac!!!
     public TransactionResultDTO executeCustomerOrderTransaction(CustomerOrderTransactionDTO transaction) throws SQLException {
         Connection conn = null;
         TransactionResultDTO result = new TransactionResultDTO();
@@ -21,19 +22,19 @@ public class CustomerOrderTransactionDAO {
             conn = DatabaseConnection.getConnection();
             conn.setAutoCommit(false);
 
-            Integer customerId = insertCustomer(conn, transaction);
+            Integer customerId = getOrCreateCustomer(conn, transaction);//create
             if (customerId == null) {
                 conn.rollback();
-                return new TransactionResultDTO(false, "Failed to create customer", "Failed to create customer");
+                return new TransactionResultDTO(false, "Failed to create or find customer", "Failed to create or find customer");
             }
 
-            Integer orderId = insertOrder(conn, transaction, customerId);
+            Integer orderId = insertOrder(conn, transaction, customerId);//create
             if (orderId == null) {
                 conn.rollback();
                 return new TransactionResultDTO(false, "Failed to create order", "Failed to create order");
             }
 
-            boolean bottlesAssigned = assignBottlesToOrder(conn, transaction, orderId);
+            boolean bottlesAssigned = assignBottlesToOrder(conn, transaction, orderId);//update
             if (!bottlesAssigned) {
                 conn.rollback();
                 return new TransactionResultDTO(false, "Failed to assign bottles to order", "Failed to assign bottles to order");
@@ -42,7 +43,7 @@ public class CustomerOrderTransactionDAO {
             conn.commit();
 
             return new TransactionResultDTO(true, "Customer order transaction completed successfully", 
-                                          customerId, orderId);
+                                              customerId, orderId);
 
         } catch (SQLException e) {
             if (conn != null) {
@@ -57,45 +58,68 @@ public class CustomerOrderTransactionDAO {
         }
     }
 
-    private Integer insertCustomer(Connection conn, CustomerOrderTransactionDTO transaction) throws SQLException {
-        String insertCustomerSql = """
-            INSERT INTO Kupac (Email, BrTel) 
-            VALUES (?, ?) 
-            RETURNING IdKup
-            """;
-
-        try (PreparedStatement stmt = conn.prepareStatement(insertCustomerSql)) {
-            stmt.setString(1, transaction.getEmail());
-            stmt.setString(2, transaction.getPhoneNumber());
-
+    private Integer getCustomerIdByEmail(Connection conn, String email) throws SQLException {
+        String sql = "SELECT IdKup FROM Kupac WHERE Email = ?";
+        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setString(1, email.trim().toLowerCase());
             try (ResultSet rs = stmt.executeQuery()) {
                 if (rs.next()) {
                     return rs.getInt("IdKup");
                 }
             }
-        } catch (SQLException e) {
-            if (e.getMessage().toLowerCase().contains("unique") || 
-                e.getMessage().toLowerCase().contains("duplicate") ||
-                e.getSQLState().equals("23505")) {
-                throw new SQLException("Customer with email " + transaction.getEmail() + " already exists. Email must be unique.", e);
-            }
-            throw e;
         }
         return null;
     }
 
+    private Integer getOrCreateCustomer(Connection conn, CustomerOrderTransactionDTO transaction) throws SQLException {
+        String normalizedEmail = transaction.getEmail().trim().toLowerCase();
+        Integer customerId = getCustomerIdByEmail(conn, normalizedEmail);
+        if (customerId != null) {
+            return customerId; 
+        }
+        return insertCustomer(conn, transaction);
+    }
+
+    private Integer insertCustomer(Connection conn, CustomerOrderTransactionDTO transaction) throws SQLException {
+        Integer nextId = getNextCustomerId(conn);
+        String insertCustomerSql = "INSERT INTO Kupac (IdKup, Email, BrTel) VALUES (?, ?, ?) RETURNING IdKup";
+        try (PreparedStatement stmt = conn.prepareStatement(insertCustomerSql)) {
+            stmt.setInt(1, nextId);
+            stmt.setString(2, transaction.getEmail().trim().toLowerCase());
+            stmt.setString(3, transaction.getPhoneNumber());
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt("IdKup");
+                }
+            }
+        }
+        return null;
+    }
+
+    private Integer getNextCustomerId(Connection conn) throws SQLException {
+        String sql = "SELECT COALESCE(MAX(IdKup), 0) + 1 FROM Kupac";
+        try (PreparedStatement stmt = conn.prepareStatement(sql);
+             ResultSet rs = stmt.executeQuery()) {
+            if (rs.next()) {
+                return rs.getInt(1);
+            }
+        }
+        return 1;
+    }
+
     private Integer insertOrder(Connection conn, CustomerOrderTransactionDTO transaction, Integer customerId) throws SQLException {
-        String insertOrderSql = """
-            INSERT INTO Narudzba (DatNar, PltMtd, Kupac_IdKup) 
-            VALUES (?, ?, ?) 
-            RETURNING IdNar
-            """;
-
+        Integer nextOrderId = getNextOrderId(conn);
+        
+        String normalizedPaymentMethod = normalizePaymentMethod(transaction.getPaymentMethod());
+        
+        String insertOrderSql = "INSERT INTO Narudzba (IdNar, DatNar, PltMtd, Kupac_IdKup) VALUES (?, ?, ?, ?) RETURNING IdNar";
+        
         try (PreparedStatement stmt = conn.prepareStatement(insertOrderSql)) {
-            stmt.setObject(1, transaction.getOrderDate());
-            stmt.setString(2, transaction.getPaymentMethod());
-            stmt.setInt(3, customerId);
-
+            stmt.setInt(1, nextOrderId);
+            stmt.setObject(2, transaction.getOrderDate());
+            stmt.setString(3, normalizedPaymentMethod);
+            stmt.setInt(4, customerId);
+            
             try (ResultSet rs = stmt.executeQuery()) {
                 if (rs.next()) {
                     return rs.getInt("IdNar");
@@ -105,6 +129,34 @@ public class CustomerOrderTransactionDAO {
         return null;
     }
 
+    private String normalizePaymentMethod(String paymentMethod) {
+        if (paymentMethod == null) {
+            return "Gotovinsko placanje"; // Default
+        }
+        
+        String normalized = paymentMethod.toLowerCase().trim();
+        
+        if (normalized.equals("karticno placanje") || normalized.equals("kartično plaćanje")) {
+            return "Karticno placanje";
+        } else if (normalized.equals("gotovinsko placanje") || normalized.equals("gotovinsko plaćanje")) {
+            return "Gotovinsko placanje";
+        } else {
+            return "Gotovinsko placanje"; // Default
+        }
+    }
+
+    private Integer getNextOrderId(Connection conn) throws SQLException {
+        String sql = "SELECT COALESCE(MAX(IdNar), 0) + 1 FROM Narudzba";
+        try (PreparedStatement stmt = conn.prepareStatement(sql);
+             ResultSet rs = stmt.executeQuery()) {
+            if (rs.next()) {
+                return rs.getInt(1);
+            }
+        }
+        return 1;
+    }
+
+    //UPDATE BOCE
     private boolean assignBottlesToOrder(Connection conn, CustomerOrderTransactionDTO transaction, Integer orderId) throws SQLException {
         if (transaction.getBottleSerialNumbers() == null || transaction.getBottleSerialNumbers().isEmpty()) {
             throw new SQLException("No bottles selected for purchase");
@@ -130,7 +182,7 @@ public class CustomerOrderTransactionDAO {
         return true;
     }
 
-    public List<BottleInfoDTO> getAvailableBottles() throws SQLException {
+    public List<Map<String, Object>> getAvailableBottlesData() throws SQLException {
         String sql = """
             SELECT b.SerBr, b.KapBoc, b.Vino_IdVina, v.NazVina, b.Narudzba_IdNar
             FROM Boca b
@@ -139,27 +191,26 @@ public class CustomerOrderTransactionDAO {
             ORDER BY b.SerBr
             """;
 
-        List<BottleInfoDTO> bottles = new ArrayList<>();
+        List<Map<String, Object>> bottles = new ArrayList<>();
 
         try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql);
              ResultSet rs = stmt.executeQuery()) {
 
             while (rs.next()) {
-                BottleInfoDTO bottle = new BottleInfoDTO(
-                    rs.getInt("SerBr"),
-                    rs.getFloat("KapBoc"),
-                    rs.getInt("Vino_IdVina"),
-                    rs.getString("NazVina"),
-                    rs.getObject("Narudzba_IdNar", Integer.class)
-                );
-                bottles.add(bottle);
+                Map<String, Object> row = new HashMap<>();
+                row.put("SerBr", rs.getInt("SerBr"));
+                row.put("KapBoc", rs.getFloat("KapBoc"));
+                row.put("Vino_IdVina", rs.getInt("Vino_IdVina"));
+                row.put("NazVina", rs.getString("NazVina"));
+                row.put("Narudzba_IdNar", rs.getObject("Narudzba_IdNar", Integer.class));
+                bottles.add(row);
             }
         }
         return bottles;
     }
 
-    public List<BottleInfoDTO> getBottlesByWineId(Integer wineId) throws SQLException {
+    public List<Map<String, Object>> getBottlesByWineIdData(Integer wineId) throws SQLException {
         String sql = """
             SELECT b.SerBr, b.KapBoc, b.Vino_IdVina, v.NazVina, b.Narudzba_IdNar
             FROM Boca b
@@ -168,7 +219,7 @@ public class CustomerOrderTransactionDAO {
             ORDER BY b.SerBr
             """;
 
-        List<BottleInfoDTO> bottles = new ArrayList<>();
+        List<Map<String, Object>> bottles = new ArrayList<>();
 
         try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
@@ -177,14 +228,13 @@ public class CustomerOrderTransactionDAO {
 
             try (ResultSet rs = stmt.executeQuery()) {
                 while (rs.next()) {
-                    BottleInfoDTO bottle = new BottleInfoDTO(
-                        rs.getInt("SerBr"),
-                        rs.getFloat("KapBoc"),
-                        rs.getInt("Vino_IdVina"),
-                        rs.getString("NazVina"),
-                        rs.getObject("Narudzba_IdNar", Integer.class)
-                    );
-                    bottles.add(bottle);
+                    Map<String, Object> row = new HashMap<>();
+                    row.put("SerBr", rs.getInt("SerBr"));
+                    row.put("KapBoc", rs.getFloat("KapBoc"));
+                    row.put("Vino_IdVina", rs.getInt("Vino_IdVina"));
+                    row.put("NazVina", rs.getString("NazVina"));
+                    row.put("Narudzba_IdNar", rs.getObject("Narudzba_IdNar", Integer.class));
+                    bottles.add(row);
                 }
             }
         }
@@ -265,7 +315,7 @@ public class CustomerOrderTransactionDAO {
         try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
 
-            stmt.setString(1, email);
+            stmt.setString(1, email.trim().toLowerCase());
 
             try (ResultSet rs = stmt.executeQuery()) {
                 if (rs.next()) {

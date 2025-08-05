@@ -1,213 +1,243 @@
--- Sample data for PostgreSQL Vinarija schema
-
--- Insert grape varieties
-INSERT INTO Sorta_Grozdja (IdSrt, Boja, ProcSec, NazSrt) VALUES
-                                                             (1, 'crvena', 13.5, 'Merlot'),
-                                                             (2, 'crvena', 14.2, 'Cabernet Sauvignon'),
-                                                             (3, 'bela', 12.8, 'Chardonnay'),
-                                                             (4, 'crvena', 13.0, 'Pinot Noir'),
-                                                             (5, 'bela', 12.5, 'Sauvignon Blanc'),
-                                                             (6, 'crvena', 14.5, 'Syrah'),
-                                                             (7, 'bela', 11.8, 'Riesling'),
-                                                             (8, 'crvena', 13.8, 'Malbec');
-
--- Insert vineyards
-INSERT INTO Vinograd (IdV, ImeV, PoV, DatOsn, VKap, Vinograd_IdV) VALUES
-                                                                      (1, 'Vinograd Fruška Gora', 25.50, '1995-03-15', 50000.0, NULL),
-                                                                      (2, 'Vinograd Sremski Karlovci', 15.20, '2000-06-20', 30000.0, 1),
-                                                                      (3, 'Vinograd Vršac', 30.75, '1990-09-10', 60000.0, NULL),
-                                                                      (4, 'Vinograd Subotica', 18.30, '2005-01-15', 35000.0, NULL),
-                                                                      (5, 'Vinograd Smederevo', 12.80, '2010-05-22', 25000.0, NULL),
-                                                                      (6, 'Vinograd Negotinska Krajina', 22.45, '1985-11-08', 45000.0, NULL),
-                                                                      (7, 'Vinograd Sektor A', 8.50, '2002-07-12', 15000.0, 1),
-                                                                      (8, 'Vinograd Sektor B', 7.00, '2003-03-01', 12000.0, 1);
-
--- Insert employees
+-- Insert into Zaposleni (Employees)
 INSERT INTO Zaposleni (IdZap, DatZap, Zar, ImeZap, kat) VALUES
-                                                            (1, '2015-03-15', 45000.00, 'Milan Petrović', 'poljoprivrednik'),
-                                                            (2, '2018-06-20', 55000.00, 'Ana Jovanović', 'somelijer'),
-                                                            (3, '2012-09-10', 48000.00, 'Dragan Nikolić', 'poljoprivrednik'),
-                                                            (4, '2019-01-15', 52000.00, 'Jelena Stojanović', 'somelijer'),
-                                                            (5, '2016-05-22', 46000.00, 'Stefan Đorđević', 'poljoprivrednik'),
-                                                            (6, '2014-11-08', 47000.00, 'Marija Pavlović', 'poljoprivrednik'),
-                                                            (7, '2020-03-01', 50000.00, 'Nikola Milić', 'somelijer'),
-                                                            (8, '2017-07-12', 45500.00, 'Sofija Ristić', 'poljoprivrednik');
+                                                            (1, '2015-03-15', 3000.00, 'Marko Markovic', 'poljoprivrednik'),
+                                                            (2, '2017-07-20', 3500.00, 'Ivana Ivanovic', 'somelijer'),
+                                                            (3, '2019-11-01', 2800.00, 'Petar Petrovic', 'poljoprivrednik'),
+                                                            (4, '2020-01-10', 3700.00, 'Jovana Jovic', 'somelijer'),
+                                                            (5, '2021-06-22', 2600.00, 'Milan Milosevic', 'poljoprivrednik'),
+                                                            (6, '2018-05-10', 3100.00, 'Jelena Jelic', 'poljoprivrednik'),
+                                                            (7, '2022-12-01', 3400.00, 'Nikola Nikolic', 'somelijer'),
+                                                            (8, '2021-04-20', 2700.00, 'Sanja Sanic', 'poljoprivrednik'),
+                                                            (9, '2023-01-12', 3600.00, 'Ana Anic', 'somelijer'),
+                                                            (10, '2020-08-30', 2900.00, 'Milos Milosevic', 'poljoprivrednik');
 
--- Insert employee subtypes
-INSERT INTO poljoprivrednik (IdZap) VALUES (1), (3), (5), (6), (8);
-INSERT INTO somelijer (IdZap) VALUES (2), (4), (7);
+-- Insert into poljoprivrednik (Farmers)
+INSERT INTO poljoprivrednik (IdZap, OblastRada) VALUES
+                                                    (1, 'Navodnjavanje'),
+                                                    (3, 'Rezidba i zaštita'),
+                                                    (5, 'Berba i transport'),
+                                                    (6, 'Navodnjavanje'),
+                                                    (8, 'Rezidba i zaštita'),
+                                                    (10, 'Berba i transport');
 
--- Insert wines
-INSERT INTO Vino (IdVina, God, ProcAlk, NazVina) VALUES
-                                                     (1, '2022-01-01', 13.5, 'Fruškogorsko Merlot 2022'),
-                                                     (2, '2021-01-01', 14.2, 'Karlovački Cabernet 2021'),
-                                                     (3, '2023-01-01', 12.8, 'Vršački Chardonnay 2023'),
-                                                     (4, '2022-01-01', 13.0, 'Subotički Pinot Noir 2022'),
-                                                     (5, '2023-01-01', 12.5, 'Smederevski Sauvignon 2023'),
-                                                     (6, '2021-01-01', 14.5, 'Negotinski Syrah 2021'),
-                                                     (7, '2023-01-01', 11.8, 'Fruškogorsko Riesling 2023'),
-                                                     (8, '2022-01-01', 13.8, 'Karlovački Malbec 2022');
+-- Insert into somelijer (Wine experts)
+INSERT INTO somelijer (IdZap, Sertifikat) VALUES
+                                              (2, 'WSET Level 3'),
+                                              (4, 'Certified Wine Judge'),
+                                              (7, 'Certified Wine Judge'),
+                                              (9, 'WSET Level 2');
 
--- Insert harvests
-INSERT INTO Berba (IdBer, DatBer, Vinograd_IdV) VALUES
-                                                    (1, '2022-09-15', 1),
-                                                    (2, '2021-09-20', 2),
-                                                    (3, '2023-09-10', 3),
-                                                    (4, '2022-09-25', 4),
-                                                    (5, '2023-09-05', 5),
-                                                    (6, '2021-09-30', 6),
-                                                    (7, '2023-09-12', 7),
-                                                    (8, '2022-09-18', 8),
-                                                    (9, '2023-09-15', 1),
-                                                    (10, '2022-09-20', 2);
+-- Insert into Sorta_Grozdja (Grape varieties)
+INSERT INTO Sorta_Grozdja (IdSrt, Boja, ProcSec, NazSrt) VALUES
+                                                             (1, 'crvena', 12.5, 'Cabernet Sauvignon'),
+                                                             (2, 'bela', 11.0, 'Chardonnay'),
+                                                             (3, 'roze', 10.0, 'Pinot Noir Rosé'),
+                                                             (4, 'bela', 12.2, 'Sauvignon Blanc'),
+                                                             (5, 'crvena', 13.0, 'Merlot'),
+                                                             (6, 'roze', 11.5, 'Zinfandel Rosé'),
+                                                             (7, 'bela', 12.3, 'Riesling'),
+                                                             (8, 'crvena', 13.8, 'Syrah'),
+                                                             (9, 'bela', 10.9, 'Pinot Grigio'),
+                                                             (10, 'crvena', 14.1, 'Malbec');
 
--- Insert vineyard-grape variety relationships
-INSERT INTO se_uzgaja (Vinograd_IdV, Sorta_Grozdja_IdSrt) VALUES
-                                                              (1, 1), (1, 7), -- Fruška Gora: Merlot, Riesling
-                                                              (2, 2), (2, 8), -- Sremski Karlovci: Cabernet, Malbec
-                                                              (3, 3), -- Vršac: Chardonnay
-                                                              (4, 4), -- Subotica: Pinot Noir
-                                                              (5, 5), -- Smederevo: Sauvignon Blanc
-                                                              (6, 6), -- Negotinska Krajina: Syrah
-                                                              (7, 1), -- Sektor A: Merlot
-                                                              (8, 2); -- Sektor B: Cabernet
+-- Insert into Vinograd (Vineyards)
+INSERT INTO Vinograd (IdV, ImeV, PoV, DatOsn, VKap, Vinograd_IdV) VALUES
+                                                                      (1, 'Beli Breg', 12.5, '2010-04-15', 5000, NULL),
+                                                                      (2, 'Zeleni Vrh', 15.2, '2012-06-20', 6000, 1),
+                                                                      (3, 'Crveni Brijeg', 9.5, '2008-09-10', 4000, NULL),
+                                                                      (4, 'Zuti Breg', 10.1, '2015-03-01', 5500, 3),
+                                                                      (5, 'Sivi Breg', 11.3, '2017-11-05', 5200, NULL),
+                                                                      (6, 'Plavi Breg', 10.5, '2016-05-20', 7000, 1),
+                                                                      (7, 'Crna Loza', 9.8, '2011-09-15', 5500, 3),
+                                                                      (8, 'Suncevo Polje', 13.0, '2019-02-28', 9000, NULL),
+                                                                      (9, 'Jesenje Polje', 11.2, '2017-08-10', 6500, 8),
+                                                                      (10, 'Ruzicasti Breg', 12.7, '2015-04-22', 6000, 6);
 
--- Insert wine-grape variety relationships
-INSERT INTO ucestvuje (Vino_IdVina, Sorta_Grozdja_IdSrt) VALUES
-                                                             (1, 1), -- Fruškogorsko Merlot - Merlot
-                                                             (2, 2), -- Karlovački Cabernet - Cabernet Sauvignon
-                                                             (3, 3), -- Vršački Chardonnay - Chardonnay
-                                                             (4, 4), -- Subotički Pinot Noir - Pinot Noir
-                                                             (5, 5), -- Smederevski Sauvignon - Sauvignon Blanc
-                                                             (6, 6), -- Negotinski Syrah - Syrah
-                                                             (7, 7), -- Fruškogorsko Riesling - Riesling
-                                                             (8, 8); -- Karlovački Malbec - Malbec
-
--- Insert employee-vineyard assignments (FIXED: Only valid combinations)
+-- Insert into Radi (Farmers working on vineyards)
 INSERT INTO Radi (poljoprivrednik_IdZap, Vinograd_IdV) VALUES
-                                                           (1, 1), (1, 7), -- Milan Petrović radi u Fruška Gora i Sektor A
-                                                           (3, 3), -- Dragan Nikolić radi u Vršac
-                                                           (5, 5), -- Stefan Đorđević radi u Smederevo
-                                                           (6, 6), -- Marija Pavlović radi u Negotinska Krajina
-                                                           (8, 3), (8, 8); -- Sofija Ristić radi u Vršac i Sektor B
+                                                           (1, 1),
+                                                           (3, 3),
+                                                           (5, 5),
+                                                           (6, 6),
+                                                           (8, 7),
+                                                           (10, 8);
 
--- Insert harvest participation (FIXED: Only valid combinations that exist in Radi table)
-INSERT INTO se_angazuje (Berba_IdBer, Vinograd_IdV, Radi_poljoprivrednik_IdZap) VALUES
-                                                                                    (1, 1, 1),
-                                                                                    (3, 3, 3),
-                                                                                    (3, 3, 8),
-                                                                                    (5, 5, 5),
-                                                                                    (6, 6, 6),
-                                                                                    (7, 7, 1),
-                                                                                    (8, 8, 8),
-                                                                                    (9, 1, 1);
+-- Insert into Vino (Wine)
+INSERT INTO Vino (IdVina, God, ProcAlk, NazVina) VALUES
+                                                     (1, '2019-09-01', 13.5, 'Cabernet Deluxe'),
+                                                     (2, '2020-05-10', 12.0, 'Chardonnay Classic'),
+                                                     (3, '2018-07-15', 11.8, 'Rosé Charm'),
+                                                     (4, '2021-04-20', 12.3, 'Sauvignon Supreme'),
+                                                     (5, '2017-11-25', 13.0, 'Merlot Magic'),
+                                                     (6, '2020-11-01', 11.8, 'Zinfandel Rosé Delight'),
+                                                     (7, '2022-07-01', 12.9, 'Riesling Fresh'),
+                                                     (8, '2023-02-01', 14.0, 'Syrah Dark'),
+                                                     (9, '2021-06-01', 11.0, 'Pinot Grigio Light'),
+                                                     (10, '2023-05-01', 14.5, 'Malbec Strong');
+
+-- Insert into Berba (Harvests)
+INSERT INTO Berba (IdBer, DatBer, Vinograd_IdV) VALUES
+                                                    (1, '2023-09-10', 1),
+                                                    (2, '2023-09-15', 3),
+                                                    (3, '2023-09-20', 5),
+                                                    (4, '2023-09-25', 6),
+                                                    (5, '2023-09-30', 7),
+                                                    (6, '2023-10-05', 8),
+                                                    (7, '2023-10-10', 9),
+                                                    (8, '2023-10-15', 10),
+                                                    (9, '2023-10-20', 2),
+                                                    (10, '2023-10-25', 4);
 
 
--- Insert customers
+-- Insert into Kupac (Customers)
 INSERT INTO Kupac (IdKup, Email, BrTel) VALUES
-                                            (1, 'petar.markovic@email.com', '061-123-4567'),
-                                            (2, 'ana.djordjevic@email.com', '062-234-5678'),
-                                            (3, 'milan.stojanovic@email.com', '063-345-6789'),
-                                            (4, 'jelena.nikolic@email.com', '064-456-7890'),
-                                            (5, 'stefan.pavlovic@email.com', '065-567-8901'),
-                                            (6, 'marija.ristic@email.com', '066-678-9012');
+                                            (1, 'pera@example.com', '+381641234567'),
+                                            (2, 'mika@example.com', '+381651234567'),
+                                            (3, 'lana@example.com', '+381661234567'),
+                                            (4, 'ana@example.com', '+381671234567'),
+                                            (5, 'igor@example.com', '+381681234567'),
+                                            (6, 'luka@example.com', '+381651234567'),
+                                            (7, 'marta@example.com', '+381661234567'),
+                                            (8, 'zoran@example.com', '+381671234567'),
+                                            (9, 'ivana2@example.com', '+381681234567'),
+                                            (10, 'milena@example.com', '+381691234567');
 
--- Insert orders
+-- Insert into Narudzba (Orders)
 INSERT INTO Narudzba (IdNar, DatNar, PltMtd, Kupac_IdKup) VALUES
-                                                              (1, '2024-01-15', 'karticno placanje', 1),
-                                                              (2, '2024-01-20', 'gotovinsko placanje', 2),
-                                                              (3, '2024-02-01', 'karticno placanje', 3),
-                                                              (4, '2024-02-05', 'gotovinsko placanje', 4),
-                                                              (5, '2024-02-10', 'gotovinsko placanje', 5),
-                                                              (6, '2024-02-15', 'karticno placanje', 6),
-                                                              (7, '2024-02-20', 'gotovinsko placanje', 4),
-                                                              (8, '2024-03-01', 'karticno placanje', 2);
+                                                              (1, '2023-08-10', 'Karticno placanje', 1),
+                                                              (2, '2023-08-15', 'Gotovinsko placanje', 2),
+                                                              (3, '2023-08-20', 'Karticno placanje', 3),
+                                                              (4, '2023-08-25', 'Gotovinsko placanje', 4),
+                                                              (5, '2023-08-30', 'Karticno placanje', 5),
+                                                              (6, '2023-09-10', 'Karticno placanje', 6),
+                                                              (7, '2023-09-15', 'Gotovinsko placanje', 7),
+                                                              (8, '2023-09-20', 'Karticno placanje', 8),
+                                                              (9, '2023-09-25', 'Gotovinsko placanje', 9),
+                                                              (10, '2023-09-30', 'Karticno placanje', 10);
 
--- Insert cellars
+-- Insert into Boca (Bottles)
+INSERT INTO Boca (SerBr, KapBoc, Vino_IdVina, Narudzba_IdNar) VALUES
+                                                                  (1001, 0.75, 1, 1),
+                                                                  (1002, 0.5, 2, 2),
+                                                                  (1003, 1.0, 3, 3),
+                                                                  (1004, 1.75, 4, 4),
+                                                                  (1005, 0.75, 5, 5),
+                                                                  (1006, 1.0, 1, 6),
+                                                                  (1007, 0.75, 6, 6),
+                                                                  (1008, 0.5, 7, 7),
+                                                                  (1009, 1.0, 8, 8),
+                                                                  (1010, 1.75, 9, 9),
+                                                                  (1011, 0.75, 10, 10),
+                                                                  (1012, 1.0, 5, 1);
+
+-- Insert into Podrum (Cellars)
 INSERT INTO Podrum (IdPod, PodTmp, PodVl, KapPod) VALUES
-                                                      (1, 15.5, 75.0, 10000.0),
-                                                      (2, 16.0, 70.0, 8000.0),
-                                                      (3, 14.8, 80.0, 12000.0),
-                                                      (4, 15.2, 72.0, 6000.0);
+                                                      (1, 12.5, 70.0, 500),
+                                                      (2, 13.0, 65.0, 600),
+                                                      (3, 11.5, 68.0, 450),
+                                                      (4, 14.0, 60.0, 700),
+                                                      (5, 10.5, 72.0, 550),
+                                                      (6, 13.5, 68.5, 450),
+                                                      (7, 12.0, 71.0, 370),
+                                                      (8, 14.5, 63.0, 520),
+                                                      (9, 11.0, 69.0, 480),
+                                                      (10, 15.5, 61.0, 1000);
 
--- Insert barrels
+-- Insert into Bure (Barrels)
 INSERT INTO Bure (IdBur, KapBur, GodPr, Vino_IdVina, Podrum_IdPod) VALUES
-(1, 50, '2023-09-15', 1, 1),
-(2, 100, '2022-09-16', 2, 2),
-(3, 20, '2021-09-17', 3, 3),
-(4, 10, '2020-09-18', 4, 4),
-(5, 50, '2019-09-19', 5, 1),
-(6, 100, '2018-09-20', 6, 2),
-(7, 20, '2017-09-21', 7, 3),
-(8, 10, '2016-09-22', 8, 4);
+                                                                       (1, 10, '2020-01-01', 1, 1),
+                                                                       (2, 20, '2021-05-15', 2, 2),
+                                                                       (3, 50, '2019-09-10', 3, 3),
+                                                                       (4, 100, '2018-12-20', 4, 4),
+                                                                       (5, 20, NULL, 5, 5),
+                                                                       (6, 10, '2023-01-01', 6, 6),
+                                                                       (7, 20, '2023-01-01', 6, 6),
+                                                                       (8, 50, '2022-12-15', 7, 7),
+                                                                       (9, 100, NULL, 8, 8),
+                                                                       (10, 10, '2021-10-05', 9, 9),
+                                                                       (11, 50, '2023-02-20', 10, 10),
+                                                                       (12, 20, NULL, 5, 1);
 
-
--- Insert bottles
-INSERT INTO Boca (SerBr, KapBoc, Vino_IdVina, Narudzba_IdNar) VALUES
-(1, 0.5, 1, 1),
-(2, 0.75, 1, 1),
-(3, 1.0, 3, 1),
-(4, 1.5, 2, 2),
-(5, 0.5, 5, 2),
-(6, 0.75, 4, 3),
-(7, 1.0, 4, 3),
-(8, 1.5, 6, 3),
-(9, 0.5, 8, 3),
-(10, 0.75, 7, 4),
-(11, 1.0, 7, 4),
-(12, 1.5, 1, 5),
-(13, 0.5, 1, 5),
-(14, 0.75, 1, 5),
-(15, 1.0, 2, 5),
-(16, 1.5, 3, 6),
-(17, 0.5, 3, 6),
-(18, 1.0, 5, 6);
-
--- Insert additional bottles available for purchase (not assigned to any order)
-INSERT INTO Boca (SerBr, KapBoc, Vino_IdVina, Narudzba_IdNar) VALUES
-(19, 0.75, 1, NULL), -- Available Merlot bottle
-(20, 1.0, 2, NULL),  -- Available Cabernet bottle
-(21, 0.5, 3, NULL),  -- Available Chardonnay bottle
-(22, 1.5, 4, NULL),  -- Available Pinot Noir bottle
-(23, 0.75, 5, NULL), -- Available Sauvignon Blanc bottle
-(24, 1.0, 6, NULL),  -- Available Syrah bottle
-(25, 0.5, 7, NULL),  -- Available Riesling bottle
-(26, 1.5, 8, NULL),  -- Available Malbec bottle
-(27, 0.75, 1, NULL), -- Another available Merlot bottle
-(28, 1.0, 2, NULL),  -- Another available Cabernet bottle
-(29, 0.5, 3, NULL),  -- Another available Chardonnay bottle
-(30, 1.5, 4, NULL);  -- Another available Pinot Noir bottle
-
--- Insert wine tastings
+-- Insert into Degustacija (Tasting events)
 INSERT INTO Degustacija (IdDeg, DatDeg, KapDeg) VALUES
-                                                    (1, '2024-03-15', 50),
-                                                    (2, '2024-04-20', 30),
-                                                    (3, '2024-05-10', 40),
-                                                    (4, '2024-06-05', 25);
+                                                    (1, '2024-01-10', 30),
+                                                    (2, '2024-02-15', 45),
+                                                    (3, '2024-03-20', 35),
+                                                    (4, '2024-04-25', 50),
+                                                    (5, '2024-05-30', 40),
+                                                    (6, '2024-01-10', 40),
+                                                    (7, '2024-02-15', 55),
+                                                    (8, '2024-03-20', 45),
+                                                    (9, '2024-04-25', 50),
+                                                    (10, '2024-05-30', 60);
 
--- Insert wine tasting organization
+-- Insert into organizuje (Somelijer organizes degustacija)
 INSERT INTO organizuje (somelijer_IdZap, Degustacija_IdDeg) VALUES
-                                                                (2, 1), -- Ana Jovanović organizuje degustaciju 1
-                                                                (4, 2), -- Jelena Stojanović organizuje degustaciju 2
-                                                                (7, 3), -- Nikola Milić organizuje degustaciju 3
-                                                                (2, 4); -- Ana Jovanović organizuje degustaciju 4
+                                                                (2, 1),
+                                                                (4, 2),
+                                                                (2, 3),
+                                                                (4, 4),
+                                                                (7, 5),
+                                                                (7, 6),
+                                                                (9, 7),
+                                                                (2, 8),
+                                                                (4, 9),
+                                                                (7, 10);
 
--- Insert wine presentations at tastings
+-- Insert into se_uzgaja (Vineyard grows grape variety)
+INSERT INTO se_uzgaja (Vinograd_IdV, Sorta_Grozdja_IdSrt) VALUES
+                                                              (1, 1),
+                                                              (2, 2),
+                                                              (3, 3),
+                                                              (4, 4),
+                                                              (5, 5),
+                                                              (6, 6),
+                                                              (7, 7),
+                                                              (8, 8),
+                                                              (9, 9),
+                                                              (10, 10),
+                                                              (3, 5),
+                                                              (2, 3),
+                                                              (5, 2),
+                                                              (1, 4);
+
+-- Insert into ucestvuje (Wine contains grape variety)
+INSERT INTO ucestvuje (Vino_IdVina, Sorta_Grozdja_IdSrt) VALUES
+                                                             (1, 1),
+                                                             (2, 2),
+                                                             (3, 3),
+                                                             (4, 4),
+                                                             (5, 5),
+                                                             (6, 6),
+                                                             (7, 7),
+                                                             (8, 8),
+                                                             (9, 9),
+                                                             (10, 10),
+                                                             (5, 1),
+                                                             (4, 3),
+                                                             (3, 2);
+
+-- Insert into se_prezentuje (Wine presented at degustacija)
 INSERT INTO se_prezentuje (Vino_IdVina, Degustacija_IdDeg) VALUES
-                                                               (1, 1), (2, 1), (3, 1), -- Degustacija 1: Merlot, Cabernet, Chardonnay
-                                                               (4, 2), (5, 2), -- Degustacija 2: Pinot Noir, Sauvignon
-                                                               (6, 3), (7, 3), (8, 3), -- Degustacija 3: Syrah, Riesling, Malbec
-                                                               (1, 4), (3, 4); -- Degustacija 4: Merlot, Chardonnay
+                                                               (1, 1),
+                                                               (2, 2),
+                                                               (3, 3),
+                                                               (4, 4),
+                                                               (5, 5),
+                                                               (6, 6),
+                                                               (7, 7),
+                                                               (8, 8),
+                                                               (9, 9),
+                                                               (10, 10),
+                                                               (1, 6),
+                                                               (2, 7),
+                                                               (3, 8);
 
--- Initialize sequences to start after existing data
-SELECT setval('kupac_id_seq', (SELECT COALESCE(MAX(IdKup), 0) + 1 FROM Kupac));
-SELECT setval('narudzba_id_seq', (SELECT COALESCE(MAX(IdNar), 0) + 1 FROM Narudzba));
-SELECT setval('boca_serbr_seq', (SELECT COALESCE(MAX(SerBr), 0) + 1 FROM Boca));
-SELECT setval('vino_id_seq', (SELECT COALESCE(MAX(IdVina), 0) + 1 FROM Vino));
-SELECT setval('sorta_grozdja_id_seq', (SELECT COALESCE(MAX(IdSrt), 0) + 1 FROM Sorta_Grozdja));
-SELECT setval('vinograd_id_seq', (SELECT COALESCE(MAX(IdV), 0) + 1 FROM Vinograd));
-SELECT setval('zaposleni_id_seq', (SELECT COALESCE(MAX(IdZap), 0) + 1 FROM Zaposleni));
-SELECT setval('berba_id_seq', (SELECT COALESCE(MAX(IdBer), 0) + 1 FROM Berba));
-SELECT setval('degustacija_id_seq', (SELECT COALESCE(MAX(IdDeg), 0) + 1 FROM Degustacija));
-SELECT setval('podrum_id_seq', (SELECT COALESCE(MAX(IdPod), 0) + 1 FROM Podrum));
-SELECT setval('bure_id_seq', (SELECT COALESCE(MAX(IdBur), 0) + 1 FROM Bure));
+-- Insert into se_angazuje (Harvest workers assigned)
+INSERT INTO se_angazuje (Berba_IdBer, Radi_poljoprivrednik_IdZap, Radi_Vinograd_IdV) VALUES
+                                                                                         (1, 1, 1),
+                                                                                         (2, 3, 3),
+                                                                                         (3, 5, 5),
+                                                                                         (4, 6, 6),
+                                                                                         (5, 8, 7),
+                                                                                         (6, 10, 8);

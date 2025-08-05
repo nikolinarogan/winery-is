@@ -5,7 +5,7 @@ public class BottleInfoDTO {
     private Float capacity;
     private Integer wineId;
     private String wineName;
-    private Integer orderId; // null if not assigned to any order
+    private Integer orderId;
 
     public BottleInfoDTO() {}
 

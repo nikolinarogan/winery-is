@@ -7,7 +7,7 @@ public class CustomerOrderTransactionDTO {
     private String email;
     private String phoneNumber;
     private String paymentMethod;
-    private List<Integer> bottleSerialNumbers; // List of existing bottle serial numbers to purchase
+    private List<Integer> bottleSerialNumbers;
     private LocalDate orderDate;
 
     public CustomerOrderTransactionDTO() {}

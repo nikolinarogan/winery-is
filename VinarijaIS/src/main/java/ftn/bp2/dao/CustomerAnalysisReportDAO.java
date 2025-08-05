@@ -1,17 +1,18 @@
 package ftn.bp2.dao;
 
-import ftn.bp2.dto.CustomerAnalysisReportDTO;
 import ftn.bp2.util.DatabaseConnection;
 
 import java.sql.*;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class CustomerAnalysisReportDAO {
 
     // Complex query:  Analiza kupaca sa preferencijama vina i brojem narudzbi na osnovu kojih se radi analiza
-    public List<CustomerAnalysisReportDTO> getCustomerAnalysisReport() throws SQLException {
-        List<CustomerAnalysisReportDTO> results = new ArrayList<>();
+    public List<Map<String, Object>> getCustomerAnalysisReportData() throws SQLException {
+        List<Map<String, Object>> results = new ArrayList<>();
 
         String sql = """
             SELECT 
@@ -44,20 +45,15 @@ public class CustomerAnalysisReportDAO {
              ResultSet rs = stmt.executeQuery()) {
 
             while (rs.next()) {
-                results.add(mapResultSetToDTO(rs));
+                Map<String, Object> row = new HashMap<>();
+                row.put("Email", rs.getString("Email"));
+                row.put("RazlicitaVina", rs.getInt("RazlicitaVina"));
+                row.put("OmiljeneSorte", rs.getString("OmiljeneSorte"));
+                row.put("BrojNarduzbi", rs.getInt("BrojNarduzbi"));
+                results.add(row);
             }
         }
 
         return results;
-    }
-
-
-    private CustomerAnalysisReportDTO mapResultSetToDTO(ResultSet rs) throws SQLException {
-        return new CustomerAnalysisReportDTO(
-                rs.getString("Email"),
-                rs.getInt("RazlicitaVina"),
-                rs.getString("OmiljeneSorte"),
-                rs.getInt("BrojNarduzbi")
-        );
     }
 } 

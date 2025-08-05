@@ -23,7 +23,7 @@ public class CustomerOrderTransactionUIHandler {
     }
 
     public void start() {
-        System.out.println("=== TRANSAKCIJA: KOMPLETNA NARUDŽBA KUPCA ===");
+        System.out.println("=== TRANSAKCIJA: KOMPLETNA NARUDŽBA NOVOG KUPCA ===");
         while (true) {
             displayMenu();
             int choice = inputHandler.getIntInput("Izaberite opciju: ");
@@ -64,7 +64,7 @@ public class CustomerOrderTransactionUIHandler {
     private void executeCustomerOrderTransaction() throws SQLException {
         System.out.println("\n=== KOMPLETNA NARUDŽBA KUPCA ===");
         System.out.println("Unesite podatke za transakciju:");
-        System.out.println("NAPOMENA: Email kupca mora biti jedinstven!");
+        System.out.println("NAPOMENA: Email kupca mora biti jedinstven, pazite prilikom dodavanja novog kupca!");
 
         // Get customer information
         System.out.print("Email kupca: ");
